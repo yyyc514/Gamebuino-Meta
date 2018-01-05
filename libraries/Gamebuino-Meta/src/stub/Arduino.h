@@ -7,6 +7,10 @@
 #include <string.h>
 #include <math.h>
 
+#include <Serial.h>
+#include <Stream.h>
+
+
 #include "time.h"
 
 #define SERCOM_SPI_MODE_0 0

@@ -32,8 +32,6 @@ Authors:
 #include "config/config.h"
 
 #include <Arduino.h>
-#include <Serial.h>
-#include <Stream.h>
 #include "time.h"
 // #include <SPI.h>
 #include "utility/SdFat.h"
