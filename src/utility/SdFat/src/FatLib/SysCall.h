@@ -25,7 +25,7 @@
  */
 #if defined(ARDUINO)
 #include <Arduino.h>
-#include <SPI.h>
+// #include <SPI.h>
 #elif defined(PLATFORM_ID)  // Only defined if a Particle device
 #include "application.h"
 #else  // defined(ARDUINO)

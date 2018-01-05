@@ -24,14 +24,16 @@ Authors:
 #ifndef _GAMEBUINO_META_H_
 #define	_GAMEBUINO_META_H_
 
-#ifndef __SKETCH_NAME__
-#error "Please compile using the Gamebuino Meta board!"
-#endif
+// #ifndef __SKETCH_NAME__
+// #error "Please compile using the Gamebuino Meta board!"
+// #endif
+
 
 #include "config/config.h"
 
 #include <Arduino.h>
-#include <SPI.h>
+#include "time.h"
+// #include <SPI.h>
 #include "utility/SdFat.h"
 extern SdFat SD;
 
@@ -53,7 +55,7 @@ extern SdFat SD;
 #endif
 
 #ifndef PROGMEM
-#define PROGMEM  
+#define PROGMEM
 #endif
 
 #ifdef GAMEBUINO_COMPAT_MODE
@@ -100,29 +102,29 @@ public:
 	uint32_t frameCount;
 	void setFrameRate(uint8_t fps);
 	void pickRandomSeed();
-	
+
 	uint8_t getCpuLoad();
 	uint16_t getFreeRam();
 	uint32_t frameDurationMicros;
 	uint32_t frameStartMicros;
 	bool frameEndFlag;
-	
+
 	int8_t menu(const char* const* items, uint8_t length);
 	void checkHomeMenu();
 	void homeMenu();
 	void keyboard(char* text, uint8_t length);
 	void popup(const char* text, uint8_t duration);
-	
+
 	void changeGame();
 	void getDefaultName(char* string);
-	
+
 	bool collidePointRect(int16_t x1, int16_t y1 ,int16_t x2 ,int16_t y2, int16_t w, int16_t h);
 	bool collideRectRect(int16_t x1, int16_t y1, int16_t w1, int16_t h1 ,int16_t x2 ,int16_t y2, int16_t w2, int16_t h2);
 	bool collideBitmapBitmap(int16_t x1, int16_t y1, const uint8_t* b1, int16_t x2, int16_t y2, const uint8_t* b2);
-	
+
 	Color createColor(uint8_t r, uint8_t g, uint8_t b);
 	uint8_t getTimePerFrame();
-	
+
 	// so that we know when the object is actually initialized
 	// importent for proper detection of what gb.display.width() and gb.display.height() return outside any function
 	// unfortunatelly the arduino platform.txt doesn't allow us to change the order of object files, which would be the prefered way

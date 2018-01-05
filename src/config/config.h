@@ -10,7 +10,7 @@
 #define DISPLAY_MODE_INDEX_HALFRES 2
 
 // let's first include our config. First one can be overriden inside the sketch, config.h contains the default configs
-#include <sketch/config-gamebuino.h>
+#include "../sketch/config-gamebuino.h"
 #include "config-default.h"
 
 #ifndef DISPLAY_CONSTRUCTOR

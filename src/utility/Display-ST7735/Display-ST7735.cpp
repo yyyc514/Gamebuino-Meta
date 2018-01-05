@@ -21,39 +21,40 @@ as well as Adafruit raw 1.8" TFT display
 	MIT license, all text above must be included in any redistribution
  ****************************************************/
 
+#include "../../Gamebuino-Meta.h"
 #include "Display-ST7735.h"
 #include <limits.h>
-#include "pins_arduino.h"
-#include "wiring_private.h"
-#include <SPI.h>
+// #include "pins_arduino.h"
+// #include "wiring_private.h"
+// #include <SPI.h>
 #include "../Image.h"
 
 
-#include "../Adafruit_ASFcore.h"
-#include "../Adafruit_ASFcore/status_codes.h"
-#include "../Adafruit_ZeroDMA.h"
-#include "../Adafruit_ZeroDMA/utility/dmac.h"
-#include "../Adafruit_ZeroDMA/utility/dma.h"
+// #include "../Adafruit_ASFcore.h"
+// #include "../Adafruit_ASFcore/status_codes.h"
+// #include "../Adafruit_ZeroDMA.h"
+// #include "../Adafruit_ZeroDMA/utility/dmac.h"
+// #include "../Adafruit_ZeroDMA/utility/dma.h"
 
 namespace Gamebuino_Meta {
 
 
-Adafruit_ZeroDMA myDMA;
-status_code stat; // we'll use this to read and print out the DMA status codes
+// Adafruit_ZeroDMA myDMA;
+// status_code stat; // we'll use this to read and print out the DMA status codes
 // are we done yet?
 volatile bool transfer_is_done = false;
 // If you like, a callback can be used
 void dma_callback(struct dma_resource* const resource) {
 	transfer_is_done = true;
 }
-void printStatus(status_code stat) {
+void printStatus(uint32_t stat) {
 	Serial.print("Status ");
 	switch (stat) {
-	case STATUS_OK:
+	case 1:
 		Serial.println("OK"); break;
-	case STATUS_BUSY:
+	case 2:
 		Serial.println("BUSY"); break;
-	case STATUS_ERR_INVALID_ARG:
+	case 3:
 		Serial.println("Invalid Arg."); break;
 	default:
 		Serial.print("Unknown 0x"); Serial.println(stat); break;
@@ -61,7 +62,7 @@ void printStatus(status_code stat) {
 }
 
 
-inline uint16_t swapcolor(uint16_t x) { 
+inline uint16_t swapcolor(uint16_t x) {
 	return (x << 11) | (x & 0x07E0) | (x >> 11);
 }
 
@@ -76,11 +77,11 @@ inline uint16_t swapcolor(uint16_t x) {
 
 // Constructor when using software SPI.	All output pins are configurable.
 Display_ST7735::Display_ST7735(int8_t cs, int8_t rs, int8_t sid, int8_t sclk, int8_t rst) : Graphics(ST7735_TFTWIDTH, ST7735_TFTHEIGHT_18) {
-	_cs	 = cs;
-	_rs	 = rs;
-	_sid	= sid;
-	_sclk = sclk;
-	_rst	= rst;
+	// _cs	 = cs;
+	// _rs	 = rs;
+	// _sid	= sid;
+	// _sclk = sclk;
+	// _rst	= rst;
 	hwSPI = false;
 }
 
@@ -88,11 +89,11 @@ Display_ST7735::Display_ST7735(int8_t cs, int8_t rs, int8_t sid, int8_t sclk, in
 // Constructor when using hardware SPI.	Faster, but must use SPI pins
 // specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
 Display_ST7735::Display_ST7735(int8_t cs, int8_t rs, int8_t rst)  : Graphics(ST7735_TFTWIDTH, ST7735_TFTHEIGHT_18) {
-	_cs	 = cs;
-	_rs	 = rs;
-	_rst	= rst;
+	// _cs	 = cs;
+	// _rs	 = rs;
+	// _rst	= rst;
 	hwSPI = true;
-	_sid	= _sclk = 0;
+	// _sid	= _sclk = 0;
 
 }
 
@@ -106,34 +107,34 @@ inline void Display_ST7735::spiwrite(uint8_t c) {
 
 	if (hwSPI) {
 #if defined (SPI_HAS_TRANSACTION)
-		SPI.transfer(c);
+		// SPI.transfer(c);
 #elif defined (__AVR__)
-		SPCRbackup = SPCR;
-		SPCR = mySPCR;
-		SPI.transfer(c);
-		SPCR = SPCRbackup;
+		// SPCRbackup = SPCR;
+		// SPCR = mySPCR;
+		// SPI.transfer(c);
+		// SPCR = SPCRbackup;
 //		SPDR = c;
 //		while(!(SPSR & _BV(SPIF)));
 #elif defined (__arm__)
-		SPI.setClockDivider(21); //4MHz
-		SPI.setDataMode(SPI_MODE0);
-		SPI.transfer(c);
+		// SPI.setClockDivider(21); //4MHz
+		// SPI.setDataMode(SPI_MODE0);
+		// SPI.transfer(c);
 #endif
 	} else {
 		// Fast SPI bitbang swiped from LPD8806 library
-		for(uint8_t bit = 0x80; bit; bit >>= 1) {
-			if(c & bit) *dataport |=	datapinmask;
-			else				*dataport &= ~datapinmask;
-			*clkport |=	clkpinmask;
-			*clkport &= ~clkpinmask;
-		}
+		// for(uint8_t bit = 0x80; bit; bit >>= 1) {
+		// 	if(c & bit) *dataport |=	datapinmask;
+		// 	else				*dataport &= ~datapinmask;
+		// 	*clkport |=	clkpinmask;
+		// 	*clkport &= ~clkpinmask;
+		// }
 	}
 }
 
 
 void Display_ST7735::writecommand(uint8_t c) {
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.beginTransaction(mySPISettings);
+	// SPI.beginTransaction(mySPISettings);
 #endif
 	commandMode();
 
@@ -142,23 +143,23 @@ void Display_ST7735::writecommand(uint8_t c) {
 
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.endTransaction();
+	// SPI.endTransaction();
 #endif
 }
 
 
 void Display_ST7735::writedata(uint8_t c) {
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.beginTransaction(mySPISettings);
+	// SPI.beginTransaction(mySPISettings);
 #endif
 	dataMode();
-		
+
 	//Serial.print("D ");
 	spiwrite(c);
 
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.endTransaction();
+	// SPI.endTransaction();
 #endif
 }
 
@@ -339,54 +340,54 @@ void Display_ST7735::commandList(const uint8_t *addr) {
 void Display_ST7735::commonInit(const uint8_t *cmdList) {
 	colstart	= rowstart = 0; // May be overridden in init func
 
-	pinMode(_rs, OUTPUT);
-	pinMode(_cs, OUTPUT);
-	csport = portOutputRegister(digitalPinToPort(_cs));
-	rsport = portOutputRegister(digitalPinToPort(_rs));
-	cspinmask = digitalPinToBitMask(_cs);
-	rspinmask = digitalPinToBitMask(_rs);
+	// pinMode(_rs, OUTPUT);
+	// pinMode(_cs, OUTPUT);
+	// csport = portOutputRegister(digitalPinToPort(_cs));
+	// rsport = portOutputRegister(digitalPinToPort(_rs));
+	// cspinmask = digitalPinToBitMask(_cs);
+	// rspinmask = digitalPinToBitMask(_rs);
 
 	if(hwSPI) { // Using hardware SPI
 #if defined (SPI_HAS_TRANSACTION)
-		SPI.begin();
-	
+		// SPI.begin();
+
 		mySPISettings = SPISettings(24000000, MSBFIRST, SPI_MODE0);
 
 #elif defined (__AVR__)
-		SPCRbackup = SPCR;
-		SPI.begin();
-		SPI.setClockDivider(SPI_CLOCK_DIV4);
-		SPI.setDataMode(SPI_MODE0);
-		mySPCR = SPCR; // save our preferred state
+		// SPCRbackup = SPCR;
+		// SPI.begin();
+		// SPI.setClockDivider(SPI_CLOCK_DIV4);
+		// SPI.setDataMode(SPI_MODE0);
+		// mySPCR = SPCR; // save our preferred state
 		//Serial.print("mySPCR = 0x"); Serial.println(SPCR, HEX);
-		SPCR = SPCRbackup;	// then restore
+		// SPCR = SPCRbackup;	// then restore
 #elif defined (__SAM3X8E__)
-		SPI.begin();
-		SPI.setClockDivider(21); //4MHz
-		SPI.setDataMode(SPI_MODE0);
+		// SPI.begin();
+		// SPI.setClockDivider(21); //4MHz
+		// SPI.setDataMode(SPI_MODE0);
 #endif
 	} else {
-		pinMode(_sclk, OUTPUT);
-		pinMode(_sid , OUTPUT);
-		clkport = portOutputRegister(digitalPinToPort(_sclk));
-		dataport = portOutputRegister(digitalPinToPort(_sid));
-		clkpinmask = digitalPinToBitMask(_sclk);
-		datapinmask = digitalPinToBitMask(_sid);
-		*clkport &= ~clkpinmask;
-		*dataport &= ~datapinmask;
+		// pinMode(_sclk, OUTPUT);
+		// pinMode(_sid , OUTPUT);
+		// clkport = portOutputRegister(digitalPinToPort(_sclk));
+		// dataport = portOutputRegister(digitalPinToPort(_sid));
+		// clkpinmask = digitalPinToBitMask(_sclk);
+		// datapinmask = digitalPinToBitMask(_sid);
+		// *clkport &= ~clkpinmask;
+		// *dataport &= ~datapinmask;
 	}
 
 	// toggle RST low to reset; CS low so it'll listen to us
-	*csport &= ~cspinmask;
-	if (_rst) {
-		pinMode(_rst, OUTPUT);
-		digitalWrite(_rst, HIGH);
-		delay(500);
-		digitalWrite(_rst, LOW);
-		delay(500);
-		digitalWrite(_rst, HIGH);
-		delay(500);
-	}
+	// *csport &= ~cspinmask;
+	// if (_rst) {
+	// 	pinMode(_rst, OUTPUT);
+	// 	digitalWrite(_rst, HIGH);
+	// 	delay(500);
+	// 	digitalWrite(_rst, LOW);
+	// 	delay(500);
+	// 	digitalWrite(_rst, HIGH);
+	// 	delay(500);
+	// }
 
 	if(cmdList) commandList(cmdList);
 }
@@ -430,7 +431,7 @@ void Display_ST7735::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y
 
 	writecommand(ST7735_CASET); // Column addr set
 	writedata(0x00);
-	writedata(x0+colstart);		 // XSTART 
+	writedata(x0+colstart);		 // XSTART
 	writedata(0x00);
 	writedata(x1+colstart);		 // XEND
 
@@ -448,7 +449,7 @@ void Display_ST7735::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y
 //the color must be formated as the destination
 void Display_ST7735::drawBufferedLine(int16_t x, int16_t y, uint16_t *buffer, uint16_t w, Image& img) {
 
-	PORT->Group[0].OUTSET.reg = (1 << 17);	// set PORTA.17 high	"digitalWrite(13, HIGH)"
+	// PORT->Group[0].OUTSET.reg = (1 << 17);	// set PORTA.17 high	"digitalWrite(13, HIGH)"
 
 	//create a local buffer line not to mess up the source
 	uint16_t bufferedLine[w];
@@ -461,46 +462,46 @@ void Display_ST7735::drawBufferedLine(int16_t x, int16_t y, uint16_t *buffer, ui
 	setAddrWindow(x, y, x + w - 1, y + 1);
 
 	//configure DMA
-	myDMA.configure_peripheraltrigger(SERCOM4_DMAC_ID_TX);	// SERMCOM4 == SPI native SERCOM
-	myDMA.configure_triggeraction(DMA_TRIGGER_ACTON_BEAT);
+	// myDMA.configure_peripheraltrigger(SERCOM4_DMAC_ID_TX);	// SERMCOM4 == SPI native SERCOM
+	// myDMA.configure_triggeraction(DMA_TRIGGER_ACTON_BEAT);
 
 	//allocate DMA
-	myDMA.allocate();
-	//printStatus(stat);
-
-	//set up transfer 
-	myDMA.setup_transfer_descriptor(bufferedLine,// move data from here
-		(void *)(&SERCOM4->SPI.DATA.reg),		// to here
-		w * 2,								// this many...
-		DMA_BEAT_SIZE_BYTE,						// 8 bits bytes
-		true,									// increment source addr?
-		false);									// increment dest addr?
+	// myDMA.allocate();
+	// //printStatus(stat);
+  //
+	// //set up transfer
+	// myDMA.setup_transfer_descriptor(bufferedLine,// move data from here
+	// 	(void *)(&SERCOM4->SPI.DATA.reg),		// to here
+	// 	w * 2,								// this many...
+	// 	DMA_BEAT_SIZE_BYTE,						// 8 bits bytes
+	// 	true,									// increment source addr?
+	// 	false);									// increment dest addr?
 
 	//add descriptor
 	//Serial.print("Adding descriptor...");
-	myDMA.add_descriptor();
+	// myDMA.add_descriptor();
 	//printStatus(stat);
 
 	//register and enable call back
 	transfer_is_done = false;
-	myDMA.register_callback(dma_callback); // by default, called when xfer done
-	myDMA.enable_callback(); // by default, for xfer done registers
+	// myDMA.register_callback(dma_callback); // by default, called when xfer done
+	// myDMA.enable_callback(); // by default, for xfer done registers
 
 	//start transfer
 	// once started, we dont need to trigger it because it will autorun
 	//Serial.println("Starting transfer job");
-	SPI.beginTransaction(mySPISettings);
+	// SPI.beginTransaction(mySPISettings);
 	dataMode();
 
-	myDMA.start_transfer_job();
+	// myDMA.start_transfer_job();
 
 	while (!transfer_is_done); //chill
 
 	idleMode();
-	SPI.endTransaction();
-	myDMA.free(); //free the DMA channel
+	// SPI.endTransaction();
+	// myDMA.free(); //free the DMA channel
 
-	PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
+	// PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
 }
 
 //fast method to quickly push a buffered line of pixels
@@ -508,48 +509,48 @@ void Display_ST7735::drawBufferedLine(int16_t x, int16_t y, uint16_t *buffer, ui
 //the color must be formated as the destination
 void Display_ST7735::drawBuffer(int16_t x, int16_t y, uint16_t *buffer, uint16_t w, uint16_t h) {
 
-	PORT->Group[0].OUTSET.reg = (1 << 17); // set PORTA.17 high	"digitalWrite(13, HIGH)"
+	// PORT->Group[0].OUTSET.reg = (1 << 17); // set PORTA.17 high	"digitalWrite(13, HIGH)"
 
 	setAddrWindow(x, y, x + w - 1, y + h - 1);
 
-	myDMA.configure_peripheraltrigger(SERCOM4_DMAC_ID_TX); // SERMCOM4 == SPI native SERCOM
-	myDMA.configure_triggeraction(DMA_TRIGGER_ACTON_BEAT);
-
-	//allocate DMA
-	myDMA.allocate();
-	//printStatus(stat);
-
-	//set up transfer 
-	myDMA.setup_transfer_descriptor(buffer,// move data from here
-		(void *)(&SERCOM4->SPI.DATA.reg),		// to here
-		w * h * 2,								// this many...
-		DMA_BEAT_SIZE_BYTE,						// 8 bits bytes
-		true,									// increment source addr?
-		false);									// increment dest addr?
-
-	//add descriptor
-	//Serial.print("Adding descriptor...");
-	myDMA.add_descriptor();
+	// myDMA.configure_peripheraltrigger(SERCOM4_DMAC_ID_TX); // SERMCOM4 == SPI native SERCOM
+	// myDMA.configure_triggeraction(DMA_TRIGGER_ACTON_BEAT);
+  //
+	// //allocate DMA
+	// myDMA.allocate();
+	// //printStatus(stat);
+  //
+	// //set up transfer
+	// myDMA.setup_transfer_descriptor(buffer,// move data from here
+	// 	(void *)(&SERCOM4->SPI.DATA.reg),		// to here
+	// 	w * h * 2,								// this many...
+	// 	DMA_BEAT_SIZE_BYTE,						// 8 bits bytes
+	// 	true,									// increment source addr?
+	// 	false);									// increment dest addr?
+  //
+	// //add descriptor
+	// //Serial.print("Adding descriptor...");
+	// myDMA.add_descriptor();
 	//printStatus(stat);
 
 	//register and enable call back
 	transfer_is_done = false;
-	myDMA.register_callback(dma_callback); // by default, called when xfer done
-	myDMA.enable_callback(); // by default, for xfer done registers
+	// myDMA.register_callback(dma_callback); // by default, called when xfer done
+	// myDMA.enable_callback(); // by default, for xfer done registers
 
 							 //start transfer
 							 // once started, we dont need to trigger it because it will autorun
 							 //Serial.println("Starting transfer job");
-	SPI.beginTransaction(mySPISettings);
+	// SPI.beginTransaction(mySPISettings);
 	dataMode();
 
-	myDMA.start_transfer_job();
+	// myDMA.start_transfer_job();
 
 	while (!transfer_is_done); //chill
 
 	idleMode();
-	SPI.endTransaction();
-	myDMA.free(); //free the DMA channel
+	// SPI.endTransaction();
+	// myDMA.free(); //free the DMA channel
 }
 
 //fast method to quickly push a buffered line of pixels
@@ -558,36 +559,36 @@ void Display_ST7735::drawBuffer(int16_t x, int16_t y, uint16_t *buffer, uint16_t
 void Display_ST7735::sendBuffer(uint16_t *buffer, uint16_t n) {
 
 	//configure DMA
-	myDMA.configure_peripheraltrigger(SERCOM4_DMAC_ID_TX); // SERMCOM4 == SPI native SERCOM
-	myDMA.configure_triggeraction(DMA_TRIGGER_ACTON_BEAT);
-
-	//allocate DMA
-	myDMA.allocate();
-	//printStatus(stat);
-
-	//set up transfer 
-	myDMA.setup_transfer_descriptor(buffer,// move data from here
-		(void *)(&SERCOM4->SPI.DATA.reg),		// to here
-		n * 2,								// this many...
-		DMA_BEAT_SIZE_BYTE,						// 8 bits bytes
-		true,									// increment source addr?
-		false);									// increment dest addr?
-
-	//add descriptor
-	//Serial.print("Adding descriptor...");
-	myDMA.add_descriptor();
+	// myDMA.configure_peripheraltrigger(SERCOM4_DMAC_ID_TX); // SERMCOM4 == SPI native SERCOM
+	// myDMA.configure_triggeraction(DMA_TRIGGER_ACTON_BEAT);
+  //
+	// //allocate DMA
+	// myDMA.allocate();
+	// //printStatus(stat);
+  //
+	// //set up transfer
+	// myDMA.setup_transfer_descriptor(buffer,// move data from here
+	// 	(void *)(&SERCOM4->SPI.DATA.reg),		// to here
+	// 	n * 2,								// this many...
+	// 	DMA_BEAT_SIZE_BYTE,						// 8 bits bytes
+	// 	true,									// increment source addr?
+	// 	false);									// increment dest addr?
+  //
+	// //add descriptor
+	// //Serial.print("Adding descriptor...");
+	// myDMA.add_descriptor();
 	//printStatus(stat);
 
 	//register and enable call back
 	transfer_is_done = false;
 
-	myDMA.register_callback(dma_callback); // by default, called when xfer done
-	myDMA.enable_callback();// by default, for xfer done registers
+	// myDMA.register_callback(dma_callback); // by default, called when xfer done
+	// myDMA.enable_callback();// by default, for xfer done registers
 
 	//start transfer
 	// once started, we dont need to trigger it because it will autorun
 	//Serial.println("Starting transfer job");
-	myDMA.start_transfer_job();
+	// myDMA.start_transfer_job();
 }
 
 uint16_t swap_endians_16(uint16_t b) {
@@ -627,7 +628,7 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img){
 		setAddrWindow(0, 0, _width - 1, _height - 1);
 
 		//initiate SPI
-		SPI.beginTransaction(mySPISettings);
+		// SPI.beginTransaction(mySPISettings);
 		dataMode();
 
 		//prepare the first line
@@ -644,8 +645,8 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img){
 			uint16_t *temp = preBufferLine;
 			preBufferLine = sendBufferLine;
 			sendBufferLine = temp;
-			
-			PORT->Group[0].OUTSET.reg = (1 << 17); // set PORTA.17 high	"digitalWrite(13, HIGH)"
+
+			// PORT->Group[0].OUTSET.reg = (1 << 17); // set PORTA.17 high	"digitalWrite(13, HIGH)"
 			sendBuffer(sendBufferLine, w); //start DMA send
 
 
@@ -668,25 +669,25 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img){
 				dest[(i * 4) + 3] = swap_endians_16((uint16_t)index[index4]);
 			}
 
-			PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
+			// PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
 
 			while (!transfer_is_done); //chill
 
-			myDMA.free(); //free the DMA channel
+			// myDMA.free(); //free the DMA channel
 		}
 
 		//send the last line
 		sendBuffer(preBufferLine, w); //start DMA send
 		while (!transfer_is_done); //chill
-		myDMA.free(); //free the DMA channel
+		// myDMA.free(); //free the DMA channel
 
 		//finish SPI
 		idleMode();
-		SPI.endTransaction();
+		// SPI.endTransaction();
 
 		return;
 	}
-	
+
 	Graphics::drawImage(x, y, img); //fallback to the usual
 }
 
@@ -712,7 +713,7 @@ void bufferIndexLineDouble(uint16_t* preBufferLine, uint16_t* img_buffer, int16_
 		*(dest++) = swap_endians_16((uint16_t)index[index4]);
 		*(dest++) = swap_endians_16((uint16_t)index[index4]);
 	}
-	
+
 	memcpy(&preBufferLine[w2], preBufferLine, w2 * 2); //double the line on the second half of the buffer
 }
 
@@ -728,7 +729,7 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int
 	}
 
 	//no scaling
-	if ((w == w2) && (h == h2)) { 
+	if ((w == w2) && (h == h2)) {
 		drawImage(x, y, img);
 		return;
 	}
@@ -745,7 +746,7 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int
 			setAddrWindow(0, 0, _width - 1, _height - 1);
 
 			//initiate SPI
-			SPI.beginTransaction(mySPISettings);
+			// SPI.beginTransaction(mySPISettings);
 			dataMode();
 
 			//prepare the first line
@@ -763,7 +764,7 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int
 				preBufferLine = sendBufferLine;
 				sendBufferLine = temp;
 
-				PORT->Group[0].OUTSET.reg = (1 << 17); // set PORTA.17 high	"digitalWrite(13, HIGH)"
+				// PORT->Group[0].OUTSET.reg = (1 << 17); // set PORTA.17 high	"digitalWrite(13, HIGH)"
 
 				sendBuffer(sendBufferLine, _width * 2); //start DMA send
 
@@ -774,21 +775,21 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int
 				}
 				memcpy(&preBufferLine[w2], preBufferLine, w2 * 2); //double the line on the second half of the buffer
 
-				PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
+				// PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
 
 				while (!transfer_is_done); //chill
 
-				myDMA.free(); //free the DMA channel
+				// myDMA.free(); //free the DMA channel
 			}
 
 			//send the last line
 			sendBuffer(preBufferLine, _width * 2); //start DMA send
 			while (!transfer_is_done); //chill
-			myDMA.free(); //free the DMA channel
+			// myDMA.free(); //free the DMA channel
 
 			//finish SPI
 			idleMode();
-			SPI.endTransaction();
+			// SPI.endTransaction();
 
 			return;
 		}
@@ -802,7 +803,7 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int
 			setAddrWindow(0, 0, _width - 1, _height - 1);
 
 			//initiate SPI
-			SPI.beginTransaction(mySPISettings);
+			// SPI.beginTransaction(mySPISettings);
 			dataMode();
 			bufferIndexLineDouble(preBufferLine, img._buffer, w, 0);
 
@@ -813,29 +814,29 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int
 				uint16_t *temp = preBufferLine;
 				preBufferLine = sendBufferLine;
 				sendBufferLine = temp;
-				
-				PORT->Group[0].OUTSET.reg = (1 << 17); // set PORTA.17 high	"digitalWrite(13, HIGH)"
+
+				// PORT->Group[0].OUTSET.reg = (1 << 17); // set PORTA.17 high	"digitalWrite(13, HIGH)"
 
 				sendBuffer(sendBufferLine, _width * 2); //start DMA send
 
 				// prepare the next line while we'r at it
 				bufferIndexLineDouble(preBufferLine, img._buffer, w, j);
 
-				PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
+				// PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
 
 				while (!transfer_is_done); //chill
 
-				myDMA.free(); //free the DMA channel
+				// myDMA.free(); //free the DMA channel
 			}
 
 			//send the last line
 			sendBuffer(preBufferLine, _width * 2); //start DMA send
 			while (!transfer_is_done); //chill
-			myDMA.free(); //free the DMA channel
+			// myDMA.free(); //free the DMA channel
 
 			//finish SPI
 			idleMode();
-			SPI.endTransaction();
+			// SPI.endTransaction();
 			return;
 		}
 	}
@@ -852,16 +853,16 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t x2, int
 
 void Display_ST7735::pushColor(uint16_t c) {
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.beginTransaction(mySPISettings);
+	// SPI.beginTransaction(mySPISettings);
 #endif
 	dataMode();
-	
+
 	spiwrite(c >> 8);
 	spiwrite(c);
 
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.endTransaction();
+	// SPI.endTransaction();
 #endif
 }
 
@@ -872,16 +873,16 @@ void Display_ST7735::_drawPixel(int16_t x, int16_t y) {
 	setAddrWindow(x,y,x+1,y+1);
 
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.beginTransaction(mySPISettings);
+	// SPI.beginTransaction(mySPISettings);
 #endif
 	dataMode();
-	
+
 	spiwrite((uint16_t)color.c >> 8);
 	spiwrite((uint16_t)color.c);
 
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.endTransaction();
+	// SPI.endTransaction();
 #endif
 }
 
@@ -893,9 +894,9 @@ void Display_ST7735::drawFastVLine(int16_t x, int16_t y, int16_t h) {
 	setAddrWindow(x, y, x, y+h-1);
 
 	uint8_t hi = (uint16_t)Graphics::color.c >> 8, lo = (uint16_t)Graphics::color.c;
-		
+
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.beginTransaction(mySPISettings);
+	// SPI.beginTransaction(mySPISettings);
 #endif
 	dataMode();
 	while (h--) {
@@ -904,7 +905,7 @@ void Display_ST7735::drawFastVLine(int16_t x, int16_t y, int16_t h) {
 	}
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.endTransaction();
+	// SPI.endTransaction();
 #endif
 }
 
@@ -918,7 +919,7 @@ void Display_ST7735::drawFastHLine(int16_t x, int16_t y, int16_t w) {
 	uint8_t hi = (uint16_t)Graphics::color.c >> 8, lo = (uint16_t)Graphics::color.c;
 
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.beginTransaction(mySPISettings);
+	// SPI.beginTransaction(mySPISettings);
 #endif
 	dataMode();
 	while (w--) {
@@ -927,7 +928,7 @@ void Display_ST7735::drawFastHLine(int16_t x, int16_t y, int16_t w) {
 	}
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.endTransaction();
+	// SPI.endTransaction();
 #endif
 }
 
@@ -941,9 +942,9 @@ void Display_ST7735::fillRect(int16_t x, int16_t y, int16_t w, int16_t h) {
 	setAddrWindow(x, y, x+w-1, y+h-1);
 
 	uint8_t hi = (uint16_t)Graphics::color.c >> 8, lo = (uint16_t)Graphics::color.c;
-		
+
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.beginTransaction(mySPISettings);
+	// SPI.beginTransaction(mySPISettings);
 #endif
 	dataMode();
 	for(y=h; y>0; y--) {
@@ -955,7 +956,7 @@ void Display_ST7735::fillRect(int16_t x, int16_t y, int16_t w, int16_t h) {
 
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
-	SPI.endTransaction();
+	// SPI.endTransaction();
 #endif
 }
 

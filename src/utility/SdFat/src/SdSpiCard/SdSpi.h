@@ -148,7 +148,7 @@ class SdSpiLib {
   void begin(uint8_t chipSelectPin) {
     pinMode(chipSelectPin, OUTPUT);
     digitalWrite(chipSelectPin, HIGH);
-    SPI.begin();
+    // SPI.begin();
   }
   /** Set SPI options for access to SD/SDHC cards.
    *
@@ -156,13 +156,13 @@ class SdSpiLib {
    */
   void beginTransaction(uint8_t divisor) {
 #if ENABLE_SPI_TRANSACTIONS
-    SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
+    // SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
 #else  // ENABLE_SPI_TRANSACTIONS
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setDataMode(SPI_MODE0);
+    // SPI.setBitOrder(MSBFIRST);
+    // SPI.setDataMode(SPI_MODE0);
 #endif  // ENABLE_SPI_TRANSACTIONS
 #ifndef SPI_CLOCK_DIV128
-    SPI.setClockDivider(divisor);
+    // SPI.setClockDivider(divisor);
 #else  // SPI_CLOCK_DIV128
     int v;
     if (divisor <= 2) {
@@ -180,7 +180,7 @@ class SdSpiLib {
     } else {
       v = SPI_CLOCK_DIV128;
     }
-    SPI.setClockDivider(v);
+    // SPI.setClockDivider(v);
 #endif  // SPI_CLOCK_DIV128
   }
   /**
@@ -188,7 +188,7 @@ class SdSpiLib {
    */
   void endTransaction() {
 #if ENABLE_SPI_TRANSACTIONS
-    SPI.endTransaction();
+    // SPI.endTransaction();
 #endif  // ENABLE_SPI_TRANSACTIONS
   }
   /** Receive a byte.
@@ -196,7 +196,7 @@ class SdSpiLib {
    * \return The byte.
    */
   uint8_t receive() {
-    return SPI.transfer(0XFF);
+    // return SPI.transfer(0XFF);
   }
   /** Receive multiple bytes.
    *
@@ -207,7 +207,7 @@ class SdSpiLib {
    */
   uint8_t receive(uint8_t* buf, size_t n) {
     for (size_t i = 0; i < n; i++) {
-      buf[i] = SPI.transfer(0XFF);
+      // buf[i] = SPI.transfer(0XFF);
     }
     return 0;
   }
@@ -216,7 +216,7 @@ class SdSpiLib {
    * \param[in] b Byte to send
    */
   void send(uint8_t b) {
-    SPI.transfer(b);
+    // SPI.transfer(b);
   }
   /** Send multiple bytes.
    *
@@ -225,7 +225,7 @@ class SdSpiLib {
    */
   void send(const uint8_t* buf , size_t n) {
     for (size_t i = 0; i < n; i++) {
-      SPI.transfer(buf[i]);
+      // SPI.transfer(buf[i]);
     }
   }
 };
