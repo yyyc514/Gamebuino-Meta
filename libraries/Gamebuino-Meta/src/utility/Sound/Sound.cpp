@@ -28,6 +28,9 @@ Authors:
 #include "../Sound-SD.h"
 #include "../../config/config.h"
 
+#define analogWrite(x, y)
+#define analogWriteResolution(x)
+
 namespace Gamebuino_Meta {
 
 const uint16_t playOKPattern[] = {0x0005,0x138,0x168,0x0000};
@@ -82,7 +85,7 @@ void tcConfigure(uint32_t sampleRate) {
 
 	TC5->COUNT16.CC[0].reg = (uint16_t) (SystemCoreClock / sampleRate - 1);
 	while (tcIsSyncing());
-	
+
 	// Configure interrupt request
 	NVIC_DisableIRQ(TC5_IRQn);
 	NVIC_ClearPendingIRQ(TC5_IRQn);
@@ -118,7 +121,7 @@ Sound_Handler::Sound_Handler(Sound_Channel* _channel) {
 }
 
 Sound_Handler::~Sound_Handler() {
-	
+
 }
 
 uint32_t Sound_Handler::getPos() {
@@ -367,11 +370,11 @@ void Audio_Handler (void) {
 		//255			7			512
 		//255			6			255		//keep sound as original
 		//255			5			127		//reduced volume
-		
+
 		output = (output * 4) >> (8 - globalVolume);
 		//offset the signed value to be centered around 512
 		//as the 10-bit DAC output is between 0 and 1024
-		
+
 		// we need to slowly fade up our zero-level to not have any plop when starting to play sound
 		if (flowdown < 512) {
 			flowdown++;
