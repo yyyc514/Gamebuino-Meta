@@ -397,7 +397,7 @@ void Audio_Handler (void) {
 	// TC5->COUNT16.INTFLAG.bit.MC0 = 1;
 }
 
-void TC5_Handler (void) __attribute__ ((alias("Audio_Handler")));
+void TC5_Handler (void) __attribute__ ((weakalias("Audio_Handler")));
 
 #ifdef __cplusplus
 }

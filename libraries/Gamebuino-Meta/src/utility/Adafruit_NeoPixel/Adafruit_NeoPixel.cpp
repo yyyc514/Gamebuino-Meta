@@ -152,20 +152,20 @@ void Adafruit_NeoPixel::show(void) {
 
   for(;;) {
     // *set = pinMask;
-    asm("nop; nop; nop; nop; nop; nop; nop; nop;");
+    // asm("nop; nop; nop; nop; nop; nop; nop; nop;");
     if(p & bitMask) {
-      asm("nop; nop; nop; nop; nop; nop; nop; nop;"
-          "nop; nop; nop; nop; nop; nop; nop; nop;"
-          "nop; nop; nop; nop;");
+      // asm("nop; nop; nop; nop; nop; nop; nop; nop;"
+          // "nop; nop; nop; nop; nop; nop; nop; nop;"
+          // "nop; nop; nop; nop;");
       // *clr = pinMask;
     } else {
       // *clr = pinMask;
-      asm("nop; nop; nop; nop; nop; nop; nop; nop;"
-          "nop; nop; nop; nop; nop; nop; nop; nop;"
-          "nop; nop; nop; nop;");
+      // asm("nop; nop; nop; nop; nop; nop; nop; nop;"
+          // "nop; nop; nop; nop; nop; nop; nop; nop;"
+          // "nop; nop; nop; nop;");
     }
     if(bitMask >>= 1) {
-        asm("nop; nop; nop; nop; nop; nop; nop; nop; nop;");
+        // asm("nop; nop; nop; nop; nop; nop; nop; nop; nop;");
     } else {
       interrupts();
       noInterrupts();
