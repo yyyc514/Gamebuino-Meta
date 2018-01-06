@@ -55,7 +55,7 @@ void Frame_Handler::allocateBuffer() {
 		img->_buffer = buf;
 		return;
 	}
-	if (buf && (uint32_t)buf >= 0x20000000) {
+	if (buf && (uint64_t)buf >= 0x20000000) {
 		free(buf);
 	}
 	if ((buf = (uint16_t *)malloc(bytes))) {
@@ -82,11 +82,11 @@ Frame_Handler_Mem::~Frame_Handler_Mem() {
 
 void Frame_Handler_Mem::set(uint16_t frame) {
 	uint32_t buf_size = img->getBufferSize();
-	img->_buffer = (uint16_t*)((uint32_t)buf + (buf_size * frame));
+	img->_buffer = (uint16_t*)((size_t)buf + (buf_size * frame));
 }
 
 void Frame_Handler_Mem::next() {
-	img->_buffer = (uint16_t*)((uint32_t)img->_buffer + img->getBufferSize());
+	img->_buffer = (uint16_t*)((size_t)img->_buffer + img->getBufferSize());
 }
 
 Frame_Handler_RAM::Frame_Handler_RAM(Image* _img) : Frame_Handler_Mem(_img) {
@@ -180,7 +180,7 @@ void Image::init(const uint16_t* buffer) {
 		delete frame_handler;
 	}
 	bufferSize = 0;
-	if (_buffer && (uint32_t)_buffer >= 0x20000000) {
+	if (_buffer && (uint64_t)_buffer >= 0x20000000) {
 		free(_buffer);
 	}
 	uint16_t* buf = (uint16_t*)buffer;
@@ -219,7 +219,7 @@ void Image::init(const uint8_t* buffer) {
 	if (frame_handler) {
 		delete frame_handler;
 	}
-	if (bufferSize && _buffer && (uint32_t)_buffer >= 0x20000000) {
+	if (bufferSize && _buffer && (uint64_t)_buffer >= 0x20000000) {
 		free(_buffer);
 	}
 
@@ -292,7 +292,7 @@ Image::~Image() {
 		return;
 	}
 	delete frame_handler;
-	if (_buffer && (uint32_t)_buffer >= 0x20000000) {
+	if (_buffer && (size_t)_buffer >= 0x20000000) {
 		free(_buffer);
 		_buffer = 0;
 	}

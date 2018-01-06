@@ -47,7 +47,7 @@ void Sound_Handler_Tone::update() {
 	if (channel->loop) {
 		return;
 	}
-	int32_t duration = (int32_t)channel->buffer;
+	int32_t duration = (int32_t)(size_t)channel->buffer;
 	duration -= gb.getTimePerFrame();
 	channel->buffer = (uint8_t*)duration;
 	if (duration <= 0) {

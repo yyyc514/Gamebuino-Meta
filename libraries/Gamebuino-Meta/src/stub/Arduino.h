@@ -7,8 +7,12 @@
 #include <string.h>
 #include <math.h>
 
+#ifdef __cplusplus
 #include <Serial.h>
 #include <Stream.h>
+#endif
+
+#define PROGMEM
 
 
 #include "time.h"
@@ -60,6 +64,21 @@ void init( void );
 /* sketch */
 void setup( void ) ;
 void loop( void ) ;
+
+// The following headers are for C++ only compilation
+#ifdef __cplusplus
+  // #include "WCharacter.h"
+  // #include "WString.h"
+  // #include "Tone.h"
+  #include "WMath.h"
+  // #include "HardwareSerial.h"
+  // #include "pulse.h"
+#endif
+// #include "delay.h"
+#ifdef __cplusplus
+  // #include "Uart.h"
+#endif
+
 
 // undefine stdlib's abs if encountered
 #ifdef abs

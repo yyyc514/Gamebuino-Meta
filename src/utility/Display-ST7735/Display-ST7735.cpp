@@ -22,6 +22,7 @@ as well as Adafruit raw 1.8" TFT display
  ****************************************************/
 
 #include "../../Gamebuino-Meta.h"
+#include "../Emu-ST7735/Emu-7735.h"
 #include "Display-ST7735.h"
 #include <limits.h>
 // #include "pins_arduino.h"
@@ -48,16 +49,17 @@ void dma_callback(struct dma_resource* const resource) {
 	transfer_is_done = true;
 }
 void printStatus(uint32_t stat) {
-	Serial.print("Status ");
+	// Serial.print("Status ");
 	switch (stat) {
 	case 1:
-		Serial.println("OK"); break;
+		// Serial.println("OK"); break;
 	case 2:
-		Serial.println("BUSY"); break;
+		// Serial.println("BUSY"); break;
 	case 3:
-		Serial.println("Invalid Arg."); break;
+		// Serial.println("Invalid Arg."); break;
 	default:
-		Serial.print("Unknown 0x"); Serial.println(stat); break;
+		// Serial.print("Unknown 0x"); Serial.println(stat); break;
+		break;
 	}
 }
 
@@ -112,6 +114,7 @@ inline void Display_ST7735::spiwrite(uint8_t c) {
 		// SPCRbackup = SPCR;
 		// SPCR = mySPCR;
 		// SPI.transfer(c);
+		hardware.data(c);
 		// SPCR = SPCRbackup;
 //		SPDR = c;
 //		while(!(SPSR & _BV(SPIF)));
@@ -139,7 +142,8 @@ void Display_ST7735::writecommand(uint8_t c) {
 	commandMode();
 
 	//Serial.print("C ");
-	spiwrite(c);
+	// spiwrite(c);
+	hardware.command((Command)c);
 
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
@@ -155,7 +159,8 @@ void Display_ST7735::writedata(uint8_t c) {
 	dataMode();
 
 	//Serial.print("D ");
-	spiwrite(c);
+	// spiwrite(c);
+	hardware.data(c);
 
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
@@ -596,20 +601,21 @@ uint16_t swap_endians_16(uint16_t b) {
 }
 
 void Display_ST7735::dataMode() {
-	*rsport |= rspinmask;
-	*csport &= ~cspinmask;
+	// *rsport |= rspinmask;
+	// *csport &= ~cspinmask;
 }
 
 void Display_ST7735::commandMode() {
-	*rsport &= ~rspinmask;
-	*csport &= ~cspinmask;
+	// *rsport &= ~rspinmask;
+	// *csport &= ~cspinmask;
 }
 
 void Display_ST7735::idleMode() {
-	*csport |= cspinmask;
+	// *csport |= cspinmask;
 }
 
 void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img){
+	printf("drawImage(3)\n");
 	img.nextFrame();
 	int16_t w = img._width;
 	int16_t h = img._height;
@@ -718,6 +724,8 @@ void bufferIndexLineDouble(uint16_t* preBufferLine, uint16_t* img_buffer, int16_
 }
 
 void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int16_t h2) {
+	printf("drawImage(5)\n");
+	return;
 	img.nextFrame();
 	//out of screen
 	if ((x > _width) || ((x + abs(w2)) < 0) || (y > _height) || ((y + abs(h2)) < 0) || (w2 == 0) || (h2 == 0)) return;
