@@ -81,6 +81,8 @@ void Gamebuino::begin() {
 	folder_name[sizeof __SKETCH_NAME__ - 4] = '\0';
 #endif
 
+
+
 	timePerFrame = 40; //25 FPS
 	//nextFrameMillis = 0;
 	//frameCount = 0;
@@ -91,24 +93,34 @@ void Gamebuino::begin() {
 	neoPixels.begin();
 	neoPixels.clear();
 
+
+
 	//buttons
 	buttons.begin();
 	buttons.update();
+
 
 	//tft
 	tft.initR(INITR_BLACKTAB);
 	tft.setRotation(3);
 
-
 	display.fill(Color::black);
 	display.fontSize = SYSTEM_DEFAULT_FONT_SIZE;
+
+
+
 
 	display.setColor(Color::white);
 	drawLogo(2, 0);
 	display.setColor(Color::brown, Color::black);
 	display.setCursor(0,display.height() - (display.getFontHeight()*display.fontSize));
 	display.print("SD INIT... ");
+
+	printf("half way\n");
+
 	updateDisplay();
+
+
 
 	if (!SD.begin(SD_CS)) {
 		display.setColor(Color::red, Color::black);
@@ -120,6 +132,7 @@ void Gamebuino::begin() {
 		display.println("OK!");
 		updateDisplay();
 	}
+	printf("after\n");
 
 	display.setColor(Color::white, Color::black);
 	display.fill(Color::black);
@@ -354,7 +367,9 @@ bool Gamebuino::update() {
 }
 
 void Gamebuino::updateDisplay() {
+	printf("updateDisplay()\n");
 	tft.drawImage(0, 0, display, tft.width(), tft.height()); //send the buffer to the screen
+	printf("doneUpdateDisplay()\n");
 }
 
 void Gamebuino::setFrameRate(uint8_t fps) {
