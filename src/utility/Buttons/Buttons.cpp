@@ -22,6 +22,7 @@ Authors:
 */
 
 #include "Buttons.h"
+#include <SDL.h>
 
 // #include <SPI.h>
 
@@ -39,6 +40,75 @@ void Buttons::begin() {
  */
 void Buttons::update() {
 
+	// none pressed
+	byte buttonsData = 0xFF;
+
+	SDL_Event e;
+	if(SDL_PollEvent( &e ) !=0) {
+		if( e.type == SDL_QUIT )
+		{
+			exit(0);
+		}
+		if (e.type == SDL_KEYDOWN) {
+			switch(e.key.keysym.sym) {
+				case SDLK_a:
+				_pressed |= (1 << (uint8_t)Button::a);
+				break;
+				case SDLK_z:
+				_pressed |= (1 << (uint8_t)Button::b);
+				break;
+				case SDLK_m:
+				_pressed |= (1 << (uint8_t)Button::c);
+				break;
+				case SDLK_RETURN:
+				_pressed |= (1 << (uint8_t)Button::d);
+				break;
+				case SDLK_UP:
+				_pressed |= (1 << (uint8_t)Button::up);
+				break;
+				case SDLK_DOWN:
+				_pressed |= (1 << (uint8_t)Button::down);
+				break;
+				case SDLK_LEFT:
+				_pressed |= (1 << (uint8_t)Button::left);
+				break;
+				case SDLK_RIGHT:
+				_pressed |= (1 << (uint8_t)Button::right);
+				break;
+			}
+		}
+		if (e.type == SDL_KEYUP) {
+			switch(e.key.keysym.sym) {
+				case SDLK_a:
+				_pressed &= ~(1 << (uint8_t)Button::a);
+				break;
+				case SDLK_z:
+				_pressed &= ~(1 << (uint8_t)Button::b);
+				break;
+				case SDLK_m:
+				_pressed &= ~(1 << (uint8_t)Button::c);
+				break;
+				case SDLK_RETURN:
+				_pressed &= ~(1 << (uint8_t)Button::d);
+				break;
+				case SDLK_UP:
+				_pressed &= ~(1 << (uint8_t)Button::up);
+				break;
+				case SDLK_DOWN:
+				_pressed &= ~(1 << (uint8_t)Button::down);
+				break;
+				case SDLK_LEFT:
+				_pressed &= ~(1 << (uint8_t)Button::left);
+				break;
+				case SDLK_RIGHT:
+				_pressed &= ~(1 << (uint8_t)Button::right);
+				break;
+			}
+		}
+	}
+
+	buttonsData &= ~_pressed;
+
 	//start SPI
 	// SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
 	// digitalWrite(BTN_CS, LOW);
@@ -46,7 +116,7 @@ void Buttons::update() {
 	// delayMicroseconds(1);
 	//get the buttons states from the shift register
 	// byte buttonsData = SPI.transfer(1);
-	byte buttonsData = 0xFF;
+
 	//end SPI
 	// digitalWrite(BTN_CS, HIGH);
 	// SPI.endTransaction();

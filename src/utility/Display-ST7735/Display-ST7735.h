@@ -161,10 +161,12 @@ public:
 	void     dummyclock(void);
 */
 
+EmuST7735 hardware = EmuST7735();
+
 private:
 	uint8_t  tabcolor;
 
-	EmuST7735 hardware = EmuST7735();
+
 
 	void     spiwrite(uint8_t),
 		writecommand(uint8_t c),

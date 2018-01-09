@@ -76,7 +76,7 @@ public:
 	// flash constructors
 	Image(const uint16_t* buffer);
 	void init(const uint16_t* buffer);
-	
+
 	// flash indexed constructors
 	Image(const uint8_t* buffer);
 	void init(const uint8_t* buffer);
@@ -86,36 +86,36 @@ public:
 	void init(char* filename, uint8_t fl = DEFAULT_FRAME_LOOP);
 	Image(uint16_t w, uint16_t h, char* filename, uint8_t fl = DEFAULT_FRAME_LOOP);
 	void init(uint16_t w, uint16_t h, char* filename, uint8_t fl = DEFAULT_FRAME_LOOP);
-	
+
 	void drawFastHLine(int16_t x, int16_t y, int16_t w) override __attribute__((optimize("-O3")));
 
-	
+
 	void nextFrame();
 	void setFrame(uint16_t frame);
 	void _drawPixel(int16_t x, int16_t y);
 	void _fill();
 	void drawBufferedLine(int16_t x, int16_t y, uint16_t *buffer, uint16_t w, Image& img);
 	void allocateBuffer();
-	
+
 	uint16_t getPixel(int16_t x, int16_t y);
 	Color getPixelColor(int16_t x, int16_t y);
 	ColorIndex getPixelIndex(int16_t x, int16_t y);
-	
+
 	bool startRecording(char* filename);
 	void stopRecording(bool output = false);
 	bool save(char* filename);
 
 	uint16_t getBufferSize();
-	
+
 	void drawChar(int16_t x, int16_t y, unsigned char c, uint8_t size);
-	
+
 	void drawBitmap(int8_t x, int8_t y, const uint8_t *bitmap);
 	void drawBitmap(int8_t x, int8_t y, const uint8_t *bitmap, uint8_t rotation, uint8_t flip);
-	
+
 	void drawImage(int16_t x, int16_t y, Image& img);
 	void drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int16_t h2);
 	void drawImage(int16_t x, int16_t y, Image& img, int16_t x2, int16_t y2, int16_t w2, int16_t h2);
-	
+
 	//`frame_looping` holds every how many frames it should get updated
 	//`frame_loopcounter` is the counter for that.
 	//Typically `frame_looping` is 1 if you want to update every frame.
@@ -123,8 +123,9 @@ public:
     //`frames` is the total number of frames and `frame` is the current one
 	//`frame_handler` is an internal object thing, there are three different kinds of frame handlers: ram buffer, flash buffer and sd card
 	//`last_frame` is used to checking that, if you draw the image multiple times within a frame, it'll only advance the animation on the first one
-	
+
 	uint16_t *_buffer;
+	bool _ram_backed;
 	uint16_t frames;
 	uint16_t frame = 0;
 	Frame_Handler* frame_handler;

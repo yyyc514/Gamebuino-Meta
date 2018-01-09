@@ -51,6 +51,8 @@ public:
 	bool repeat(Button button, uint16_t period);
 	uint16_t timeHeld(Button button);
 	uint16_t states[NUM_BTN];
+private:
+	uint8_t _pressed = 0;
 };
 
 } // namespace Gamebuino_Meta
