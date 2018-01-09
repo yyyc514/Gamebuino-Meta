@@ -39,6 +39,10 @@ as well as Adafruit raw 1.8" TFT display
 
 namespace Gamebuino_Meta {
 
+uint16_t swap_endians_16(uint16_t b) {
+	return (b << 8) | (b >> 8);
+}
+
 
 // Adafruit_ZeroDMA myDMA;
 // status_code stat; // we'll use this to read and print out the DMA status codes
@@ -104,34 +108,7 @@ Display_ST7735::Display_ST7735(int8_t cs, int8_t rs, int8_t rst)  : Graphics(ST7
 #endif
 
 inline void Display_ST7735::spiwrite(uint8_t c) {
-
-	//Serial.println(c, HEX);
-
-	if (hwSPI) {
-#if defined (SPI_HAS_TRANSACTION)
-		// SPI.transfer(c);
-#elif defined (__AVR__)
-		// SPCRbackup = SPCR;
-		// SPCR = mySPCR;
-		// SPI.transfer(c);
-		hardware.data(c);
-		// SPCR = SPCRbackup;
-//		SPDR = c;
-//		while(!(SPSR & _BV(SPIF)));
-#elif defined (__arm__)
-		// SPI.setClockDivider(21); //4MHz
-		// SPI.setDataMode(SPI_MODE0);
-		// SPI.transfer(c);
-#endif
-	} else {
-		// Fast SPI bitbang swiped from LPD8806 library
-		// for(uint8_t bit = 0x80; bit; bit >>= 1) {
-		// 	if(c & bit) *dataport |=	datapinmask;
-		// 	else				*dataport &= ~datapinmask;
-		// 	*clkport |=	clkpinmask;
-		// 	*clkport &= ~clkpinmask;
-		// }
-	}
+	hardware.data(c);
 }
 
 
@@ -466,6 +443,10 @@ void Display_ST7735::drawBufferedLine(int16_t x, int16_t y, uint16_t *buffer, ui
 
 	setAddrWindow(x, y, x + w - 1, y + 1);
 
+	for (uint16_t i = 0; i < w; i++) {
+		pushColor(swap_endians_16(bufferedLine[i]));
+	}
+
 	//configure DMA
 	// myDMA.configure_peripheraltrigger(SERCOM4_DMAC_ID_TX);	// SERMCOM4 == SPI native SERCOM
 	// myDMA.configure_triggeraction(DMA_TRIGGER_ACTON_BEAT);
@@ -488,7 +469,7 @@ void Display_ST7735::drawBufferedLine(int16_t x, int16_t y, uint16_t *buffer, ui
 	//printStatus(stat);
 
 	//register and enable call back
-	transfer_is_done = false;
+	// transfer_is_done = false;
 	// myDMA.register_callback(dma_callback); // by default, called when xfer done
 	// myDMA.enable_callback(); // by default, for xfer done registers
 
@@ -500,7 +481,7 @@ void Display_ST7735::drawBufferedLine(int16_t x, int16_t y, uint16_t *buffer, ui
 
 	// myDMA.start_transfer_job();
 
-	while (!transfer_is_done); //chill
+	// while (!transfer_is_done); //chill
 
 	idleMode();
 	// SPI.endTransaction();
@@ -517,6 +498,10 @@ void Display_ST7735::drawBuffer(int16_t x, int16_t y, uint16_t *buffer, uint16_t
 	// PORT->Group[0].OUTSET.reg = (1 << 17); // set PORTA.17 high	"digitalWrite(13, HIGH)"
 
 	setAddrWindow(x, y, x + w - 1, y + h - 1);
+
+	for (uint16_t i = 0; i < w*h; i++) {
+		pushColor(swap_endians_16(buffer[i]));
+	}
 
 	// myDMA.configure_peripheraltrigger(SERCOM4_DMAC_ID_TX); // SERMCOM4 == SPI native SERCOM
 	// myDMA.configure_triggeraction(DMA_TRIGGER_ACTON_BEAT);
@@ -539,7 +524,7 @@ void Display_ST7735::drawBuffer(int16_t x, int16_t y, uint16_t *buffer, uint16_t
 	//printStatus(stat);
 
 	//register and enable call back
-	transfer_is_done = false;
+	// transfer_is_done = false;
 	// myDMA.register_callback(dma_callback); // by default, called when xfer done
 	// myDMA.enable_callback(); // by default, for xfer done registers
 
@@ -551,7 +536,7 @@ void Display_ST7735::drawBuffer(int16_t x, int16_t y, uint16_t *buffer, uint16_t
 
 	// myDMA.start_transfer_job();
 
-	while (!transfer_is_done); //chill
+	// while (!transfer_is_done); //chill
 
 	idleMode();
 	// SPI.endTransaction();
@@ -562,6 +547,10 @@ void Display_ST7735::drawBuffer(int16_t x, int16_t y, uint16_t *buffer, uint16_t
 //boundary check must be made prior to this function
 //the color must be formated as the destination
 void Display_ST7735::sendBuffer(uint16_t *buffer, uint16_t n) {
+
+	for (uint16_t i = 0; i < n; i++) {
+		pushColor(swap_endians_16(buffer[i]));
+	}
 
 	//configure DMA
 	// myDMA.configure_peripheraltrigger(SERCOM4_DMAC_ID_TX); // SERMCOM4 == SPI native SERCOM
@@ -585,7 +574,7 @@ void Display_ST7735::sendBuffer(uint16_t *buffer, uint16_t n) {
 	//printStatus(stat);
 
 	//register and enable call back
-	transfer_is_done = false;
+	// transfer_is_done = false;
 
 	// myDMA.register_callback(dma_callback); // by default, called when xfer done
 	// myDMA.enable_callback();// by default, for xfer done registers
@@ -596,9 +585,6 @@ void Display_ST7735::sendBuffer(uint16_t *buffer, uint16_t n) {
 	// myDMA.start_transfer_job();
 }
 
-uint16_t swap_endians_16(uint16_t b) {
-	return (b << 8) | (b >> 8);
-}
 
 void Display_ST7735::dataMode() {
 	// *rsport |= rspinmask;
@@ -615,7 +601,7 @@ void Display_ST7735::idleMode() {
 }
 
 void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img){
-	printf("drawImage(3)\n");
+	// printf("drawImage(3)\n");
 	img.nextFrame();
 	int16_t w = img._width;
 	int16_t h = img._height;
@@ -677,14 +663,14 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img){
 
 			// PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
 
-			while (!transfer_is_done); //chill
+			// while (!transfer_is_done); //chill
 
 			// myDMA.free(); //free the DMA channel
 		}
 
 		//send the last line
 		sendBuffer(preBufferLine, w); //start DMA send
-		while (!transfer_is_done); //chill
+		// while (!transfer_is_done); //chill
 		// myDMA.free(); //free the DMA channel
 
 		//finish SPI
@@ -724,8 +710,8 @@ void bufferIndexLineDouble(uint16_t* preBufferLine, uint16_t* img_buffer, int16_
 }
 
 void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int16_t h2) {
-	printf("drawImage(5)\n");
-	return;
+	// printf("drawImage(5)\n");
+	// return;
 	img.nextFrame();
 	//out of screen
 	if ((x > _width) || ((x + abs(w2)) < 0) || (y > _height) || ((y + abs(h2)) < 0) || (w2 == 0) || (h2 == 0)) return;
@@ -785,14 +771,14 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int
 
 				// PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
 
-				while (!transfer_is_done); //chill
+				// while (!transfer_is_done); //chill
 
 				// myDMA.free(); //free the DMA channel
 			}
 
 			//send the last line
 			sendBuffer(preBufferLine, _width * 2); //start DMA send
-			while (!transfer_is_done); //chill
+			// while (!transfer_is_done); //chill
 			// myDMA.free(); //free the DMA channel
 
 			//finish SPI
@@ -832,14 +818,14 @@ void Display_ST7735::drawImage(int16_t x, int16_t y, Image& img, int16_t w2, int
 
 				// PORT->Group[0].OUTCLR.reg = (1 << 17); // clear PORTA.17 high "digitalWrite(13, LOW)"
 
-				while (!transfer_is_done); //chill
+				// while (!transfer_is_done); //chill
 
 				// myDMA.free(); //free the DMA channel
 			}
 
 			//send the last line
 			sendBuffer(preBufferLine, _width * 2); //start DMA send
-			while (!transfer_is_done); //chill
+			// while (!transfer_is_done); //chill
 			// myDMA.free(); //free the DMA channel
 
 			//finish SPI

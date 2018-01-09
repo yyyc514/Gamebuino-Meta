@@ -55,7 +55,7 @@ void Frame_Handler::allocateBuffer() {
 		img->_buffer = buf;
 		return;
 	}
-	if (buf && (uint64_t)buf >= 0x20000000) {
+	if (buf && img->_ram_backed) {
 		free(buf);
 	}
 	if ((buf = (uint16_t *)malloc(bytes))) {
@@ -155,6 +155,7 @@ void Image::init(uint16_t w, uint16_t h, ColorMode col, uint16_t _frames, uint8_
 		bufferSize = 0;
 		_buffer = 0;
 	}
+	_ram_backed = true;
 	transparentColor = 0xF81F;
 	frames = _frames;
 	colorMode = col;
@@ -188,9 +189,10 @@ void Image::init(const uint16_t* buffer, ColorMode col, uint16_t _frames, uint8_
 		delete frame_handler;
 	}
 	bufferSize = 0;
-	if (_buffer && (uint64_t)_buffer >= 0x20000000) {
+	if (_buffer && _ram_backed) {
 		free(_buffer);
 	}
+	_ram_backed = false;
 	transparentColor = 0xF81F;
 	frames = _frames;
 	colorMode = col;
@@ -226,9 +228,10 @@ void Image::init(const uint8_t* buffer, ColorMode col, uint16_t _frames, uint8_t
 	if (frame_handler) {
 		delete frame_handler;
 	}
-	if (bufferSize && _buffer && (uint64_t)_buffer >= 0x20000000) {
+	if (bufferSize && _buffer && _ram_backed) {
 		free(_buffer);
 	}
+	_ram_backed = false;
 	useTransparentIndex = false;
 	frames = _frames;
 	colorMode = col;
@@ -267,6 +270,7 @@ void Image::init(uint16_t w, uint16_t h, char* filename, uint8_t fl) {
 		_buffer = 0;
 	}
 	transparentColor = 0;
+	_ram_backed = false;
 	_width = w;
 	_height = h;
 	frame_looping = fl;
@@ -287,7 +291,7 @@ Image::~Image() {
 		return;
 	}
 	delete frame_handler;
-	if (_buffer && (size_t)_buffer >= 0x20000000) {
+	if (_buffer && _ram_backed) {
 		free(_buffer);
 		_buffer = 0;
 	}

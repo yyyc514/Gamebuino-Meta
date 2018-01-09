@@ -33,8 +33,17 @@ void setupUSB() __attribute__((weak));
 void setupUSB() { }
 
 void init() {
-	SDL_Init(SDL_INIT_VIDEO);
+
+	// printf("init() in core.cpp\n");
+	// if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+	// {
+	// 	printf("error initing SDL");
+	// 	exit(0);
+	// }
 }
+
+
+int i = 0;
 
 int main(void)
 {
@@ -49,7 +58,10 @@ int main(void)
 	setup();
 
 	for (;;) {
+
+		// printf("%d\n", i);
 		loop();
+		i++;
 		// if (serialEventRun) serialEventRun();
 	}
 

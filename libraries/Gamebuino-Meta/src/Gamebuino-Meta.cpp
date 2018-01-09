@@ -367,9 +367,10 @@ bool Gamebuino::update() {
 }
 
 void Gamebuino::updateDisplay() {
-	printf("updateDisplay()");
+	// printf("updateDisplay()");
 	tft.drawImage(0, 0, display, tft.width(), tft.height()); //send the buffer to the screen
-	printf("doneUpdateDisplay()\n");
+	tft.hardware.refresh();
+	// printf("doneUpdateDisplay()\n");
 }
 
 void Gamebuino::setFrameRate(uint8_t fps) {
@@ -864,6 +865,7 @@ void Gamebuino::homeMenu(){
 
 			//updated nopixels
 			neoPixels.show();
+			tft.hardware.refresh();
 
 			changed = false;
 		}

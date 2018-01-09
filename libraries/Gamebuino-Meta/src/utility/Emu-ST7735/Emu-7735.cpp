@@ -3,10 +3,27 @@
 
 EmuST7735::EmuST7735() {
   swreset();
+  printf("setting up EMUST7735\n");
 
+  SDL_Init( SDL_INIT_VIDEO );
   window = SDL_CreateWindow( "Gamebuino META", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-    160*3, 128*3, SDL_WINDOW_SHOWN);
-  refresh();
+    160*4, 128*4, SDL_WINDOW_SHOWN);
+  if( window == NULL )
+	{
+		printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
+  }
+  SDL_SetWindowResizable(window, SDL_TRUE);
+
+  //Get window surface
+  screenSurface = SDL_GetWindowSurface( window );
+
+  // Fill the surface white
+  SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) );
+
+  //Update the surface
+  SDL_UpdateWindowSurface( window );
+
+  // refresh();
 };
 
 
@@ -20,26 +37,28 @@ void EmuST7735::swreset() {
   displayOn = false;
 }
 
-void EmuST7735::command(Command c) {
+void EmuST7735::command(Command cmd) {
+  // printf("cmd %d\n", cmd);
   // commands with no params
-  if (last_command == INVERT_OFF) {
+  if (cmd == INVERT_OFF) {
     inverted = false;
-  } else if (last_command = INVERT_ON) {
+  } else if (cmd == INVERT_ON) {
     inverted = true;
-  } else if (last_command = DISPON) {
+  } else if (cmd == DISPON) {
     displayOn = true;
-  } else if (last_command = DISPOFF) {
+  } else if (cmd == DISPOFF) {
     displayOn = false;
-  } else if (last_command = SWRESET) {
+  } else if (cmd == SWRESET) {
     swreset();
   } else {
     // ready to receive commands
-    last_command = c;
+    last_command = cmd;
     param_count = 0;
   }
 };
 
 void EmuST7735::data(uint8_t d) {
+  // printf("data [last cmd: %d]", last_command);
   if (last_command == RAMWR) {
     cmd_ramwr(d);
     return;
@@ -83,6 +102,7 @@ void EmuST7735::cmd_raset() {
 }
 
 void EmuST7735::cmd_ramwr(uint8_t d) {
+  // printf("cmd_ramwr\n");
   pixel_data[pixel_data_cursor] = d;
   pixel_data_cursor++;
 
@@ -105,6 +125,7 @@ void EmuST7735::cmd_ramwr(uint8_t d) {
 }
 
 void EmuST7735::incrementCursor() {
+  cursor_x++;
   // wrap cursor around
   if (cursor_x > x_end) {
     cursor_x = x_start;
@@ -116,12 +137,14 @@ void EmuST7735::incrementCursor() {
 }
 
 void EmuST7735::writePixel_16bit() {
+  // printf("writePixel_16bit\n");
   Pixel &p = vram[cursor_y * width + cursor_x];
 
   // TODO: check for GRB mode?
   p.red = pixel_data[0] & 0b11111000;
   p.green = (pixel_data[0] << 5) + (pixel_data[1] >> 3);
   p.blue = (pixel_data[1]) << 3;
+  // printf("r%d, g%d, b%d\n", p.red, p.green, p.blue);
 
   // renderPixel(p);
   incrementCursor();
@@ -160,15 +183,18 @@ void EmuST7735::renderPixel(Pixel &p) {
 
 // paint vram to the actual screen
 void EmuST7735::refresh() {
-  Pixel *p = &vram[cursor_y * width + cursor_x];
+  screenSurface = SDL_GetWindowSurface( window );
+  Pixel *p = &vram[0];
   for (uint8_t y = 0; y < height; y++) {
     for (uint8_t x = 0; x < width; x++) {
-
-      p+=3;
+      SDL_Rect r = {.x = x*4, .y = y*4 , .w = 4, .h = 4};
+      SDL_FillRect(screenSurface, &r, SDL_MapRGB(screenSurface->format, p->red, p->green, p->blue));
+      p+=1;
     }
   }
-  SDL_UpdateWindowSurface(window);
 
+  // SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) );
+  SDL_UpdateWindowSurface(window);
 }
 
 void EmuST7735::param(uint8_t d) {

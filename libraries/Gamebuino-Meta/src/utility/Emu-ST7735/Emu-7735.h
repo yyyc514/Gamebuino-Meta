@@ -12,9 +12,9 @@ enum Command {
   INVERT_ON = 0x21,
   DISPOFF = 0x28,
   DISPON = 0x29,
-  RAMWR = 0x2C,
   CASET = 0x2A, // column address set
   RASET = 0x2B, // row address set
+  RAMWR = 0x2C,
   COLMOD = 0x3A, // interface pixel format
 };
 
@@ -40,7 +40,8 @@ public:
 
 private:
 
-  SDL_Window *window;
+  SDL_Window *window = NULL;
+  SDL_Surface *screenSurface = NULL;
 
   // logical width and height of display
   uint8_t width = 160;
