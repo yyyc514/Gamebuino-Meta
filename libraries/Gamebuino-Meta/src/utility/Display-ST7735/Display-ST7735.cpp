@@ -114,6 +114,7 @@ inline void Display_ST7735::spiwrite(uint8_t c) {
 		// SPCRbackup = SPCR;
 		// SPCR = mySPCR;
 		// SPI.transfer(c);
+		hardware.data(c);
 		// SPCR = SPCRbackup;
 //		SPDR = c;
 //		while(!(SPSR & _BV(SPIF)));
@@ -141,7 +142,8 @@ void Display_ST7735::writecommand(uint8_t c) {
 	commandMode();
 
 	//Serial.print("C ");
-	spiwrite(c);
+	// spiwrite(c);
+	hardware.command((Command)c);
 
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)
@@ -157,7 +159,8 @@ void Display_ST7735::writedata(uint8_t c) {
 	dataMode();
 
 	//Serial.print("D ");
-	spiwrite(c);
+	// spiwrite(c);
+	hardware.data(c);
 
 	idleMode();
 #if defined (SPI_HAS_TRANSACTION)

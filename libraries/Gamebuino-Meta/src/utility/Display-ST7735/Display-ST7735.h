@@ -24,6 +24,8 @@ as well as Adafruit raw 1.8" TFT display
 #ifndef _GAMEBUINO_META_GRAPHICS_ST7735_H_
 #define _GAMEBUINO_META_GRAPHICS_ST7735_H_
 
+#include "../Emu-ST7735/Emu-7735.h"
+
 #if ARDUINO >= 100
 	#include "Arduino.h"
 	#include "Print.h"
@@ -160,6 +162,8 @@ public:
 
 private:
 	uint8_t  tabcolor;
+
+	EmuST7735 hardware = EmuST7735();
 
 	void     spiwrite(uint8_t),
 		writecommand(uint8_t c),

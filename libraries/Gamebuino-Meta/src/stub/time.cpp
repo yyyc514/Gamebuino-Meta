@@ -20,7 +20,7 @@ void delayMicroseconds(uint32_t us) {
 
 uint32_t micros() {
   // TODO: can't we do better than this?
-  millis() * 1000;
+  return millis() * 1000;
 };
 
 uint32_t millis() {

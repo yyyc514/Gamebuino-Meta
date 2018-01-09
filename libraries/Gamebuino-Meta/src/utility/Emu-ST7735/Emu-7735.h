@@ -1,6 +1,9 @@
 #ifndef Emu_7735_H
 #define Emu_7735_H
 
+#include "Arduino.h"
+#include <SDL.h>
+
 
 enum Command {
   NOP = 0,
@@ -30,12 +33,14 @@ struct Pixel {
 class EmuST7735 {
 public:
   EmuST7735();
-  void reset();
+  void swreset();
   void command(Command c);
   void data(uint8_t d);
   void refresh();
 
 private:
+
+  SDL_Window *window;
 
   // logical width and height of display
   uint8_t width = 160;

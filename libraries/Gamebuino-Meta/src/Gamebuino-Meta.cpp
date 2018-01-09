@@ -367,7 +367,7 @@ bool Gamebuino::update() {
 }
 
 void Gamebuino::updateDisplay() {
-	printf("updateDisplay()\n");
+	printf("updateDisplay()");
 	tft.drawImage(0, 0, display, tft.width(), tft.height()); //send the buffer to the screen
 	printf("doneUpdateDisplay()\n");
 }

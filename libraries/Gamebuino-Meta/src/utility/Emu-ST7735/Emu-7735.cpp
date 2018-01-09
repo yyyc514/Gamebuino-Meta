@@ -2,10 +2,16 @@
 #include "Emu-7735.h"
 
 EmuST7735::EmuST7735() {
-  reset();
+  swreset();
+
+  window = SDL_CreateWindow( "Gamebuino META", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+    160*3, 128*3, SDL_WINDOW_SHOWN);
+  refresh();
 };
 
-void EmuST7735::reset() {
+
+void EmuST7735::swreset() {
+  // do we need to reset the screen here to blank?
   pixel_format = PF_18BIT;
   inverted = false;
   cursor_x = 0;
@@ -24,6 +30,8 @@ void EmuST7735::command(Command c) {
     displayOn = true;
   } else if (last_command = DISPOFF) {
     displayOn = false;
+  } else if (last_command = SWRESET) {
+    swreset();
   } else {
     // ready to receive commands
     last_command = c;
@@ -159,6 +167,8 @@ void EmuST7735::refresh() {
       p+=3;
     }
   }
+  SDL_UpdateWindowSurface(window);
+
 }
 
 void EmuST7735::param(uint8_t d) {

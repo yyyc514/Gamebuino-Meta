@@ -18,6 +18,8 @@
 */
 
 #include <Arduino.h>
+#include <SDL.h>
+
 
 // Declared weak in Arduino.h to allow user redefinitions.
 int atexit(void (* /*func*/ )()) { return 0; }
@@ -30,9 +32,13 @@ void initVariant() { }
 void setupUSB() __attribute__((weak));
 void setupUSB() { }
 
+void init() {
+	SDL_Init(SDL_INIT_VIDEO);
+}
+
 int main(void)
 {
-	// init();
+	init();
 
 	initVariant();
 
