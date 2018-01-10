@@ -5,7 +5,7 @@ EmuST7735::EmuST7735() {
   swreset();
   printf("setting up EMUST7735\n");
 
-  SDL_Init( SDL_INIT_VIDEO );
+  SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO );
   window = SDL_CreateWindow( "Gamebuino META", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
     160*4, 128*4, SDL_WINDOW_SHOWN);
   if( window == NULL )
