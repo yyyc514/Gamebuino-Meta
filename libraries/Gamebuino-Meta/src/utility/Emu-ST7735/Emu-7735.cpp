@@ -3,14 +3,16 @@
 
 EmuST7735::EmuST7735() {
   swreset();
+};
+
+void EmuST7735::begin() {
   printf("setting up EMUST7735\n");
 
-  SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO );
   window = SDL_CreateWindow( "Gamebuino META", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
     160*4, 128*4, SDL_WINDOW_SHOWN);
   if( window == NULL )
-	{
-		printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
+  {
+    printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
   }
   SDL_SetWindowResizable(window, SDL_TRUE);
 
@@ -18,13 +20,14 @@ EmuST7735::EmuST7735() {
   screenSurface = SDL_GetWindowSurface( window );
 
   // Fill the surface white
-  SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) );
+  SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0x00, 0x00, 0x00 ) );
 
   //Update the surface
   SDL_UpdateWindowSurface( window );
+  // SDL_Delay(100);
 
   // refresh();
-};
+}
 
 
 void EmuST7735::swreset() {

@@ -312,7 +312,7 @@ void Display_ST7735::commandList(const uint8_t *addr) {
 		if(ms) {
 			ms = pgm_read_byte(addr++); // Read post-command delay time (ms)
 			if(ms == 255) ms = 500;		 // If 255, delay for 500 ms
-			delay(ms);
+			// delay(ms);
 		}
 	}
 }
