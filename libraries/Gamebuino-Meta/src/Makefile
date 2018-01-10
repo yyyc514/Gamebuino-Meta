@@ -8,8 +8,8 @@ SRC=$(wildcard utility/*.cpp) \
 	$(wildcard utility/*/*/*/*.cpp) \
 	stub/Print.cpp \
 	stub/time.cpp \
-	stub/WMath.cpp
-
+	stub/WMath.cpp \
+	Gamebuino-Meta.cpp
 
 CFLAGS=-std=c++11  $(INCLUDES) -w -g
 DEFINES=-DARDUINO=185 -D__arm__
@@ -18,6 +18,9 @@ BUILD_DIR=build
 OFILES=$(foreach bname, $(notdir $(basename $(SRC))), $(BUILD_DIR)/$(bname).o) \
 	build/font3x5.o
 # OFILES=$(foreach bname, $(basename $(SRC)), $(BUILD_DIR)/$(bname).o)
+
+
+# /Applications/Arduino.app/Contents/Java/arduino-builder -hardware /Applications/Arduino.app/Contents/Java/hardware -hardware /Users/jgoebel/Documents/Arduino/hardware -tools /tmp -fqbn=gamebuino_meta:samd:gamebuino_meta_native -ide-version=10805 -build-path build /Users/jgoebel/git/arduino/meta-solitaire/meta-solitaire/meta-solitaire.ino
 
 # vpath %.cpp utility/**/**
 # vpath %.cpp utility/**
@@ -52,15 +55,19 @@ $(BUILD_DIR)/%.o : utility/**/**/%.cpp
 $(BUILD_DIR)/%.o : utility/**/**/**/%.cpp
 	g++ -c $^ $(CFLAGS) $(LIBS) $(DEFINES) -o $@
 
+$(BUILD_DIR)/%.o : Gamebuino-Meta.cpp Gamebuino-Meta.h
+	g++ -c -o $@ $(CFLAGS) $(LIBS) $(DEFINES) $(filter %.cpp %.o, $^)
 
-meta.so: $(OFILES) Gamebuino-Meta.cpp Gamebuino-Meta.h
+meta.o: $(OFILES)
 # $(OBJDIR) meta.so: $(SRC) Gamebuino-Meta.h
 	# g++ -shared -c $(SRC) $(CFLAGS) $(LIBS) $(DEFINES)
-	g++ -shared -o $@ $(CFLAGS) $(LIBS) $(DEFINES) $(filter %.cpp %.o, $^)
+	# g++ -c -o $@ $(CFLAGS) $(LIBS) $(DEFINES) $(filter %.cpp %.o, $^)
+	ar ru $@ $^
+	ranlib $@
 
 SOLITAIRE_SRC=$(wildcard meta-solitaire/meta-solitaire/*.cpp)
 
-solitaire: $(SOLITAIRE_SRC) meta.so stub/core.cpp
+solitaire: $(SOLITAIRE_SRC) meta.o stub/core.cpp
 	g++ -o $@ $^ $(CFLAGS) $(LIBS) $(DEFINES)
 
 clean:
