@@ -101,6 +101,7 @@ void Gamebuino::begin() {
 
 
 	//tft
+	tft.hardware.begin();
 	tft.initR(INITR_BLACKTAB);
 	tft.setRotation(3);
 
@@ -119,14 +120,15 @@ void Gamebuino::begin() {
 	printf("half way\n");
 
 	updateDisplay();
+	SDL_Delay(500);
 
 
-
-	if (!SD.begin(SD_CS)) {
+	// if (!SD.begin(SD_CS)) {
+	if (true) {
 		display.setColor(Color::red, Color::black);
 		display.println("FAILED!");
 		updateDisplay();
-		delay(1000);
+		// delay(1000);
 	} else {
 		display.setColor(Color::lightgreen, Color::black);
 		display.println("OK!");
@@ -606,9 +608,36 @@ void Gamebuino::homeMenu(){
 	tft.fontSize = 2;
 	tft.textWrap = false;
 	//horizontal stripes
-	tft.setColor(DARKGRAY);
-	for (int i = 12; i < tft.height(); i+=4){
-		tft.fillRect(0, i, tft.width(), 2);
+
+	// tft.setColor(DARKGRAY);
+	// for (int i = 12; i < tft.height(); i+=4){
+		// tft.fillRect(0, i, tft.width(), 2);
+	// }
+	tft.setAddrWindow(0,0,159,127);
+	uint16_t *b = display._buffer;
+	uint16_t data;
+	for (uint16_t y=0; y<64; y++) {
+		for (uint16_t x=0; x<80; x++) {
+			data = *b;
+			//        gggbbbbbrrrrrggg
+			// data &= 0b1101111011110111;
+			// data &= 0b0001111011110000;
+			//        rrrrrggggggbbbbb
+			data &= 0b1110011110011100;
+			data >>= 2;
+			tft.pushColor(data);
+			tft.pushColor(data);
+			b++;
+		}
+		b-=80;
+		for (uint16_t x=0; x<80; x++) {
+			data = *b;
+			data &= 0b1110011110011100;
+			data >>= 1;
+			tft.pushColor(data);
+			tft.pushColor(data);
+			b++;
+		}
 	}
 
 	tft.setColor(DARKGRAY);

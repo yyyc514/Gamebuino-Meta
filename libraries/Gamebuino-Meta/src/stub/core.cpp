@@ -34,6 +34,7 @@ void setupUSB() { }
 
 void init() {
 
+	SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO );
 	// printf("init() in core.cpp\n");
 	// if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
 	// {

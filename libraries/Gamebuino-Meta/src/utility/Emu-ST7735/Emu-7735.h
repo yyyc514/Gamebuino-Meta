@@ -34,6 +34,7 @@ class EmuST7735 {
 public:
   EmuST7735();
   void swreset();
+  void begin();
   void command(Command c);
   void data(uint8_t d);
   void refresh();
