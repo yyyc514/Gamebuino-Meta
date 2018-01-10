@@ -44,7 +44,7 @@ void Buttons::update() {
 	byte buttonsData = 0xFF;
 
 	SDL_Event e;
-	if(SDL_PollEvent( &e ) !=0) {
+	while(SDL_PollEvent( &e ) !=0) {
 		if( e.type == SDL_QUIT )
 		{
 			exit(0);
