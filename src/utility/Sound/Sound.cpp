@@ -21,6 +21,7 @@ Authors:
  - Sorunome
 */
 
+#include <SDL.h>
 #include "Sound.h"
 #include "Pattern.h"
 #include "Tone.h"
@@ -135,12 +136,34 @@ void Sound_Handler::setChannel(Sound_Channel* _channel) {
 	channel = _channel;
 }
 
+extern "C" void fillBuffer(void*  userdata, Uint8* stream, int len);
+
+SDL_AudioDeviceID dev;
+
 void Sound::begin() {
 #if SOUND_CHANNELS > 0
 	dacConfigure();
 	tcConfigure(SOUND_FREQ);
 	tcStart();
 #endif
+
+	SDL_AudioSpec want, have;
+	SDL_zero(want);
+	want.freq = SOUND_FREQ;
+	want.format = AUDIO_U8;
+	want.channels = 1;
+	want.samples = 2048;
+	want.callback = fillBuffer;
+
+	dev = SDL_OpenAudioDevice(NULL, 0, &want, &have, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+	if (dev == 0) {
+    SDL_Log("Failed to open audio: %s", SDL_GetError());
+	} else {
+	  if (have.format != want.format) {
+      SDL_Log("We didn't get AUDIO_U8 audio format.");
+	  }
+	  SDL_PauseAudioDevice(dev, 0); /* start audio playing. */
+	}
 }
 
 int8_t Sound::play(const char* filename, bool loop) {
@@ -347,16 +370,27 @@ uint32_t Sound::getPos(int8_t i) {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void Audio_Handler (void) __attribute__((optimize("-O3")));
+uint16_t Audio_Handler (void) __attribute__((optimize("-O3")));
 
 uint16_t flowdown = 0;
 
-void Audio_Handler (void) {
+void fillBuffer(void*  userdata, Uint8* stream, int len) {
+	uint16_t sample;
+	for(uint16_t i=0; i < len; i++) {
+			sample = Audio_Handler();
+			sample >>= 2; // 10-bit back to 8 bit audio since we have no 10-bit DAC
+			stream[i] = sample;
+	}
+}
+
+uint16_t Audio_Handler (void) {
+	int16_t output = 0;
+
 	if (!globalVolume || muted) {
 		// TC5->COUNT16.INTFLAG.bit.MC0 = 1;
-		return;
+		return output;
 	}
-	int16_t output = 0;
+
 	for (uint8_t i = 0; i < SOUND_CHANNELS; i++) {
 		if (channels[i].use) {
 			switch (channels[i].type) {
@@ -424,12 +458,14 @@ void Audio_Handler (void) {
 		if (output < 0) {
 			output = 0;
 		}
-		analogWrite(A0, output);
+		// analogWrite(A0, output);
+		return output;
 	} else {
 		// we need to output 0 when not in use to not have weird sound effects with the neoLeds as the interrupt isn't 100% constant there.
 		// however, jumping down from 512 (zero-positin) to 0 would give a plop
 		// so instead we gradually decrease instead
-		analogWrite(A0, flowdown); // zero-position
+		// analogWrite(A0, flowdown); // zero-position
+		return flowdown;
 		if (flowdown > 0) {
 			flowdown--;
 		}
