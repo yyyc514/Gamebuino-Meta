@@ -27,7 +27,10 @@ OFILES=$(foreach bname, $(notdir $(basename $(SRC))), $(BUILD_DIR)/$(bname).o) \
 
 # $(warning $(OFILES))
 
-all: solitaire
+all: $(BUILD_DIR) solitaire
+
+$(BUILD_DIR):
+	mkdir $(BUILD_DIR)
 
 build/font3x5.o: utility/Graphics/font3x5.c
 	gcc -c $< $(INCLUDES) -o $@
