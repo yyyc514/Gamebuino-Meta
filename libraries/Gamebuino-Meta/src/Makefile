@@ -12,7 +12,7 @@ SRC=$(wildcard utility/*.cpp) \
 	Gamebuino-Meta.cpp
 
 CFLAGS=-std=c++11  $(INCLUDES) -w -g
-DEFINES=-DARDUINO=185 -D__arm__
+DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION
 OBJDIR=obj
 BUILD_DIR=build
 OFILES=$(foreach bname, $(notdir $(basename $(SRC))), $(BUILD_DIR)/$(bname).o) \
