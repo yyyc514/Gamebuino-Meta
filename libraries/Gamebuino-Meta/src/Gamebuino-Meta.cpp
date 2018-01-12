@@ -22,10 +22,11 @@ Authors:
 */
 
 #include "Gamebuino-Meta.h"
+#include "utility/FakeSD/FakeSD.h"
 #include "utility/Graphics-SD.h"
 #include "utility/Misc.h"
 #include "utility/Language/SystemLanguage.h"
-SdFat SD;
+SdFat SD("./fs/");
 
 // a 3x5 font table
 extern const uint8_t font3x5[];
@@ -81,7 +82,7 @@ void Gamebuino::begin() {
 	folder_name[sizeof __SKETCH_NAME__ - 4] = '\0';
 #endif
 
-
+	printf("folder name is %s\n", folder_name);
 
 	timePerFrame = 40; //25 FPS
 	//nextFrameMillis = 0;
@@ -388,7 +389,7 @@ uint8_t Gamebuino::getCpuLoad(){
 	return(frameDurationMicros/(10*timePerFrame));
 }
 
-extern "C" char* sbrk(int incr);
+// extern "C" char* sbrk(int incr);
 uint16_t Gamebuino::getFreeRam() {
 	// from https://github.com/mpflaga/Arduino-MemoryFree/blob/master/MemoryFree.cpp
 	char top;

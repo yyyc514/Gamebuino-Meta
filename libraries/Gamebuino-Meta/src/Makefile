@@ -7,14 +7,14 @@ SRC_ALL=$(wildcard utility/*.cpp) \
 	$(wildcard utility/*/*/*.cpp) \
 	$(wildcard utility/*/*/*/*.cpp) \
 	stub/Print.cpp \
-	stub/time.cpp \
+	stub/timekeeping.cpp \
 	stub/WMath.cpp \
 	Gamebuino-Meta.cpp
 
-SRC=$(filter-out utility/Adafruit_ZeroDMA/%,$(SRC_ALL))
+SRC=$(filter-out utility/Adafruit_ZeroDMA/% utility/SdFat/%,$(SRC_ALL))
 
 CFLAGS=-std=c++11  $(INCLUDES) -w -g
-DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION
+DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION -D__SKETCH_NAME__='"solitaire.ino"'
 OBJDIR=obj
 BUILD_DIR=build
 OFILES=$(foreach bname, $(notdir $(basename $(SRC))), $(BUILD_DIR)/$(bname).o) \
@@ -50,6 +50,12 @@ $(BUILD_DIR)/%.o : stub/%.cpp
 
 $(BUILD_DIR)/%.o : utility/%.cpp
 	g++ -c $^ $(CFLAGS) $(LIBS) $(DEFINES) -o $@
+
+$(BUILD_DIR)/FakeSD.o: utility/FakeSD/FakeSD.cpp utility/FakeSD/*.h
+	g++ -c $< $(CFLAGS) $(LIBS) $(DEFINES) -o $@
+
+$(BUILD_DIR)/File.o: utility/FakeSD/File.cpp  utility/FakeSD/*.h
+	g++ -c $< $(CFLAGS) $(LIBS) $(DEFINES) -o $@
 
 $(BUILD_DIR)/%.o : utility/**/%.cpp
 	g++ -c $^ $(CFLAGS) $(LIBS) $(DEFINES) -o $@
