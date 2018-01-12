@@ -176,7 +176,7 @@ private:
 		datapinmask, clkpinmask, cspinmask, rspinmask,
 		colstart, rowstart; // some displays need this changed
 #elif defined(__arm__)
-	volatile RwReg  *dataport, *clkport, *csport, *rsport;
+	volatile uint32_t  *dataport, *clkport, *csport, *rsport;
 	uint32_t  _cs, _rs, _sid, _sclk,
 		datapinmask, clkpinmask, cspinmask, rspinmask,
 		colstart, rowstart; // some displays need this changed

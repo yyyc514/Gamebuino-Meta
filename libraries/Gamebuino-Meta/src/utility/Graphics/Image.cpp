@@ -21,9 +21,10 @@ Authors:
  - Sorunome
 */
 
+#include "../../Gamebuino-Meta.h"
 #include "Image.h"
 #include "../Graphics-SD.h"
-#include "../../Gamebuino-Meta.h"
+
 
 namespace Gamebuino_Meta {
 
@@ -69,7 +70,7 @@ void Frame_Handler::allocateBuffer() {
 }
 
 Frame_Handler_Mem::Frame_Handler_Mem(Image* _img) : Frame_Handler(_img) {
-	
+
 }
 
 Frame_Handler_Mem::~Frame_Handler_Mem() {
@@ -196,7 +197,7 @@ void Image::init(const uint16_t* buffer, ColorMode col, uint16_t _frames, uint8_
 	uint16_t* buf = (uint16_t*)buffer;
 	_width = *(buf++);
 	_height = *(buf++);
-	
+
 	_buffer = buf;
 	frame_looping = fl;
 	frame_handler = new Frame_Handler_Mem(this);
@@ -295,10 +296,10 @@ Image::~Image() {
 void Image::drawFastHLine(int16_t x, int16_t y, int16_t w) {
 	// Don't draw if we are outside the screen
 	if (x + w <= 0 || x >= _width || y < 0 || y >= _height) return;
-	
+
 	if (colorMode == ColorMode::rgb565) {
 
-		
+
 		// Clamp value so we don't go outside the buffer
 		uint16_t new_x = max(x,0);
 		uint32_t bound = new_x + min(w - (new_x - x),_width-new_x);
@@ -307,7 +308,7 @@ void Image::drawFastHLine(int16_t x, int16_t y, int16_t w) {
 			_buffer[y * _width + new_x] = (uint16_t)color.c;
 			new_x ++;
 		}
-		
+
 		_buffer[y * _width + bound-1] = (uint16_t)color.c;
 		for (uint32_t i = new_x>>1; i < (bound>>1); i++){
 			((uint32_t*)_buffer)[(y * (_width>>1)) + i] = ((uint16_t)color.c << 16) | (uint16_t)color.c;
@@ -454,7 +455,7 @@ void Image::_fill() {
 				for (i = 0; i<pixels; i++) _buffer[i] = (uint16_t)color.c;
 			}
 		}
-		
+
 		if (colorMode == ColorMode::index) {
 			uint8_t pack = ((uint8_t)color.i) | ((uint8_t)color.iu);
 			memset(_buffer, pack, _width * _height / 2);
@@ -634,7 +635,7 @@ void Image::drawChar(int16_t x, int16_t y, unsigned char c, uint8_t size) {
 		 ((x + fontWidth * size - 1) < 0) || // Clip left
 		 ((y + fontHeight * size - 1) < 0))   // Clip top
 		return;
-	
+
 	if (size == 2 && colorMode == ColorMode::index) {
 		if(!_cp437 && (c >= 176)) c++; // Handle 'classic' charset behavior
 		if (c >= 0x80) c -= 0x20;
@@ -672,14 +673,14 @@ void Image::drawChar(int16_t x, int16_t y, unsigned char c, uint8_t size) {
 				_buf++;
 				buf = _buf;
 			}
-			
+
 			return;
 		} else {
 			uint8_t fg1 = color.i;
 			uint8_t fg2 = color.iu;
 			uint8_t bg1 = bgcolor.i;
 			uint8_t bg2 = bgcolor.iu;
-			
+
 			uint8_t* buf = (uint8_t*)_buffer;
 			uint8_t img_bytewidth = (_width + 1) / 2;
 			buf += y*img_bytewidth + (x / 2);
@@ -727,15 +728,15 @@ void Image::drawChar(int16_t x, int16_t y, unsigned char c, uint8_t size) {
 			return;
 		}
 	}
-	
-	
+
+
 	Graphics::drawChar(x, y, c, size);
 }
 
 void Image::drawBitmap(int8_t x, int8_t y, const uint8_t *bitmap) {
 	uint8_t w = *(bitmap++);
 	uint8_t h = *(bitmap++);
-	
+
 	if ((x >= _width) || (y >= _height) || (x + w <= 0) || (x + h <= 0)) {
 		return;
 	}
@@ -753,18 +754,18 @@ void Image::drawBitmap(int8_t x, int8_t y, const uint8_t *bitmap) {
 		}
 		uint8_t x1 = max(0, x);
 		uint8_t x2 = min(_width, x + w);
-		
+
 		bitmap += (x1 - x) / 8;
 		uint8_t first_bitmap_mask = 0x80 >> ((x1 - x) & 7);
 		uint16_t bufBytewidth = ((_width + 1) / 2);
 		uint8_t* buf = (uint8_t*)_buffer;
 		buf += bufBytewidth * y + x1 / 2;
 		bool screen_alt_initial = (x1 % 2) == 0;
-		
-		
+
+
 		uint8_t b1 = color.i;
 		uint8_t b2 = color.iu;
-		
+
 		for (uint8_t dy=0; dy<h; dy++, bitmap+=bw, buf+=bufBytewidth) {
 			const uint8_t* bitmap_ptr = bitmap;
 			uint8_t bitmap_mask = first_bitmap_mask;
@@ -772,7 +773,7 @@ void Image::drawBitmap(int8_t x, int8_t y, const uint8_t *bitmap) {
 			uint8_t pixels = *(bitmap_ptr++);
 			bool screen_alt = screen_alt_initial;
 			for (uint8_t sx=x1; sx<x2; sx++) {
-				
+
 				if (screen_alt) {
 					if (pixels & bitmap_mask) {
 						*screen_buf = (*screen_buf & 0x0F) | b2;
@@ -784,7 +785,7 @@ void Image::drawBitmap(int8_t x, int8_t y, const uint8_t *bitmap) {
 					screen_buf++;
 				}
 				screen_alt = !screen_alt;
-				
+
 				bitmap_mask >>= 1;
 				if (!bitmap_mask) {
 					bitmap_mask = 0x80;
@@ -853,20 +854,20 @@ void Image::drawImage(int16_t x, int16_t y, Image& img) {
 		} else if ((y + h1) > _height) {
 			h2cropped = _height - y;
 		}
-		
+
 		for (int j2 = 0; j2 < h2cropped; j2++) {
 			uint8_t *srcLine;
-			
+
 			// w1+1 for ceiling rather than flooring
 			srcLine = (uint8_t*)img._buffer + ((w1 + 1) / 2) * (j2 + j2offset) + (i2offset/2);
-			
+
 
 			indexTo565(
 				&_buffer[x + i2offset + (y + j2offset + j2)*_width],
 				srcLine, colorIndex, w2cropped, i2offset%2
 			);
 		}
-		
+
 		return;
 	}
 	Graphics::drawImage(x, y, img);

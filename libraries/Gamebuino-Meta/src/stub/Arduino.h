@@ -7,6 +7,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "time.h"
+
 #define SERCOM_SPI_MODE_0 0
 #define SERCOM_SPI_MODE_1 0
 #define SERCOM_SPI_MODE_2 0
@@ -22,6 +24,28 @@ typedef uint16_t word;
 #define OUTPUT 1
 #define digitalWrite(x,y)
 #define pinMode(x,y)
+
+
+
+/* misc */
+
+typedef enum
+{
+	MSB_FIRST = 0,
+	LSB_FIRST
+} SercomDataOrder;
+
+
+enum BitOrder {
+	LSBFIRST = 0,
+	MSBFIRST = 1
+};
+
+
+
+/* misc end */
+
+#include "binary.h"
 
 void yield( void ) ;
 
@@ -47,8 +71,8 @@ void loop( void ) ;
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
 
-#define interrupts() __enable_irq()
-#define noInterrupts() __disable_irq()
+#define interrupts()  // __enable_irq()
+#define noInterrupts() // __disable_irq()
 
 #define lowByte(w) ((uint8_t) ((w) & 0xff))
 #define highByte(w) ((uint8_t) ((w) >> 8))

@@ -24,14 +24,14 @@ Authors:
 #include "Gamebuino-Meta.h"
 #include "utility/Graphics-SD.h"
 #include "utility/Misc.h"
-#include "utility/Language/SystemLanguage.h"	
+#include "utility/Language/SystemLanguage.h"
 SdFat SD;
 
 // a 3x5 font table
 extern const uint8_t font3x5[];
 
 namespace Gamebuino_Meta {
-	
+
 // we have more blocks for, in case we add things in the future, old games are less likely to erase our new blocks
 const uint8_t SETTINGSCONF_NUM_BLOCKS = 32;
 const SaveDefault settingsDefaults [] = {
@@ -68,10 +68,10 @@ const uint16_t startSound[] = {0x0005,0x338,0x3FC,0x254,0x1FC,0x25C,0x3FC,0x368,
 
 void Gamebuino::begin() {
 	// first we disable the watchdog timer so that we tell the bootloader everything is fine!
-	WDT->CTRL.bit.ENABLE = 0;
-	
+	// WDT->CTRL.bit.ENABLE = 0;
+
 	// let's to some sanity checks which are done on compile-time
-	
+
 	// check that the folder name length is at least 4 chars
 #ifdef FOLDER_NAME
 	static_assert(sizeof FOLDER_NAME - 1 >= 4, "your FOLDER_NAME must be at least 4 chars long!");
@@ -80,7 +80,7 @@ void Gamebuino::begin() {
 	memcpy(folder_name, __SKETCH_NAME__, sizeof __SKETCH_NAME__ - 4);
 	folder_name[sizeof __SKETCH_NAME__ - 4] = '\0';
 #endif
-	
+
 	timePerFrame = 40; //25 FPS
 	//nextFrameMillis = 0;
 	//frameCount = 0;
@@ -94,22 +94,22 @@ void Gamebuino::begin() {
 	//buttons
 	buttons.begin();
 	buttons.update();
-	
+
 	//tft
 	tft.initR(INITR_BLACKTAB);
 	tft.setRotation(3);
-	
-	
+
+
 	display.fill(Color::black);
 	display.fontSize = SYSTEM_DEFAULT_FONT_SIZE;
-	
+
 	display.setColor(Color::white);
 	drawLogo(2, 0);
 	display.setColor(Color::brown, Color::black);
 	display.setCursor(0,display.height() - (display.getFontHeight()*display.fontSize));
 	display.print("SD INIT... ");
 	updateDisplay();
-	
+
 	if (!SD.begin(SD_CS)) {
 		display.setColor(Color::red, Color::black);
 		display.println("FAILED!");
@@ -123,39 +123,41 @@ void Gamebuino::begin() {
 
 	display.setColor(Color::white, Color::black);
 	display.fill(Color::black);
-	
+
 	// SD is initialized, let's switch to the folder!
 	if (!SD.exists(folder_name)) {
 		SD.mkdir(folder_name);
 	}
 	SD.chdir(folder_name);
-	
+
 	save = Save(&tft, SAVEFILE_NAME, folder_name);
-	
+
 	settings = Save(&tft, "/SETTINGS.SAV", "GBMS");
 	settings.config(SETTINGSCONF_NUM_BLOCKS, settingsDefaults);
-	
+
 	//sound
 	sound.begin();
 	if (settings.get(SETTING_VOLUME_MUTE)) {
 		sound.mute();
 	}
 	sound.setVolume(settings.get(SETTING_VOLUME));
-	
+
 	// language
 	language.setCurrentLang((LangCode)settings.get(SETTING_LANGUAGE));
-	
+
 	// neoPixels
 	neoPixels.setBrightness(neoPixelsIntensities[settings.get(SETTING_NEOPIXELS_INTENSITY)]);
-	
+
 	Graphics_SD::setTft(&tft);
 	// only do titleScreen after a hard power on
-	if (PM->RCAUSE.bit.POR) {
+	// if (PM->RCAUSE.bit.POR) {
+	if (true) {
 		startScreen();
 #if AUTOSHOW_TITLESCREEN
 		titleScreen();
 #endif
 	}
+	// TODO: restore functionality
 	pickRandomSeed();
 	display.clear();
 }
@@ -192,7 +194,7 @@ void Gamebuino::titleScreen() {
 	uint16_t ts_backup_height = display._height;
 	display.fontSize = SYSTEM_DEFAULT_FONT_SIZE;
 	char filename[17] = "TITLESCREEN.BMP";
-	
+
 	bool titleScreenImageExists = SD.exists(filename);
 	bool displayName = !titleScreenImageExists;
 	if (!titleScreenImageExists && SD.exists("REC")) {
@@ -216,10 +218,10 @@ void Gamebuino::titleScreen() {
 	if (titleScreenImageExists) {
 		display.init(ts_backup_width, ts_backup_height, filename);
 	}
-	
+
 	bool first = true;
 	bool reInitDisplay = false;
-	
+
 	const char* msg = language._get(lang_titlescreen_a_start);
 	uint8_t w = display.fontWidth*strlen(msg)*display.fontSize;
 	uint8_t h = display.fontHeight*display.fontSize;
@@ -240,7 +242,7 @@ void Gamebuino::titleScreen() {
 		} else {
 			display.clear();
 		}
-		
+
 		if (displayName) {
 			// center bar
 			display.setColor(BROWN);
@@ -252,7 +254,7 @@ void Gamebuino::titleScreen() {
 				display.drawFastHLine(0, 14*display.fontSize + 1, 80*display.fontSize);
 				display.drawFastHLine(0, 24*display.fontSize + 1, 80*display.fontSize);
 			}
-			
+
 			// game name
 			display.setColor(WHITE);
 			display.setCursor(2*display.fontSize, 17*display.fontSize);
@@ -260,13 +262,13 @@ void Gamebuino::titleScreen() {
 		}
 		// flashing "A to start"
 		if ((frameCount % 32) < 20) {
-			
+
 			display.setColor(Color::darkgray);
 			display.drawRect(x - display.fontSize*2, y - display.fontSize*2, w + display.fontSize*4, h + display.fontSize*3);
 			if (display.fontSize > 1) {
 				display.drawRect(x - display.fontSize*2 + 1, y - display.fontSize*2 + 1, w + display.fontSize*4 - 2, h + display.fontSize*3 - 2);
 			}
-			
+
 			display.setColor(Color::brown);
 			display.fillRect(x - display.fontSize, y - display.fontSize, w + display.fontSize*2, h + display.fontSize);
 			display.setColor(Color::white);
@@ -304,21 +306,21 @@ bool Gamebuino::update() {
 		return false;
 	}
 	// ok, here is the first time after a frame, so we'll better check stuff correctly
-	
+
 	//Home menu
 	checkHomeMenu();
-	
+
 	//draw and update popups
 	updatePopup();
-	
+
 	Graphics_SD::update(); // update screen recordings
-	
+
 	sound.update(); // update sound stuff once per frame
-	
-	
+
+
 	//send buffer to the screen
 	updateDisplay();
-	
+
 	//neoPixels update
 	uint8_t px_height = lights.height();
 	uint8_t px_width = lights.width();
@@ -360,15 +362,16 @@ void Gamebuino::setFrameRate(uint8_t fps) {
 }
 
 void Gamebuino::pickRandomSeed(){
-	randomSeed(micros() * micros() ^ analogRead(1)*analogRead(2)); // can't use analogRad(0) as we have a speaker attached there
+	// TODO: restore functionality
+	// randomSeed(micros() * micros() ^ analogRead(1)*analogRead(2)); // can't use analogRad(0) as we have a speaker attached there
 }
 
 uint8_t Gamebuino::getCpuLoad(){
 	return(frameDurationMicros/(10*timePerFrame));
 }
 
-extern "C" char* sbrk(int incr);	
-uint16_t Gamebuino::getFreeRam() {	
+extern "C" char* sbrk(int incr);
+uint16_t Gamebuino::getFreeRam() {
 	// from https://github.com/mpflaga/Arduino-MemoryFree/blob/master/MemoryFree.cpp
 	char top;
 	return &top - reinterpret_cast<char*>(sbrk(0));
@@ -501,7 +504,7 @@ void Gamebuino::checkHomeMenu() {
 
 void Hook_ExitHomeMenu() __attribute__((weak));
 void Hook_ExitHomeMenu() {
-	
+
 }
 
 bool homeMenuGetUniquePath(char* name, uint8_t offset, uint8_t len) {
@@ -545,9 +548,9 @@ void Gamebuino::homeMenu(){
 	//here we don't use gb.update and display.not to interfere with the game
 	//the only things we use are gb.tft and gb.buttons
 	sound.startEfxOnly();
-	
+
 	HOME_MENU_SAVE_STATE;
-	
+
 	int currentItem = 0;
 	const int numItems = 5;
 	unsigned long lastMillis = 0;
@@ -559,7 +562,7 @@ void Gamebuino::homeMenu(){
 	const int xOffset = 40;
 	boolean changed = true;
 	int frameCounter = 0;
-	
+
 	const MultiLang* menuText[numItems] = {
 		lang_homeMenu_exit,
 		lang_homeMenu_volume,
@@ -567,15 +570,15 @@ void Gamebuino::homeMenu(){
 		lang_homeMenu_save_video,
 		lang_homeMenu_light,
 	};
-	
-	
+
+
 	neoPixels.clear();
 	neoPixels.show();
 	// determin the neoPixel color index
 	uint8_t neoPixelsIntensity = 0;
 	for (;(neoPixelsIntensity < 5) && (neoPixels.getBrightness() > neoPixelsIntensities[neoPixelsIntensity]);neoPixelsIntensity++);
-	
-	
+
+
 	//static screen content
 	//logo
 	tft.setColor(BLACK);
@@ -591,7 +594,7 @@ void Gamebuino::homeMenu(){
 	for (int i = 12; i < tft.height(); i+=4){
 		tft.fillRect(0, i, tft.width(), 2);
 	}
-	
+
 	tft.setColor(DARKGRAY);
 	//first row
 	tft.fillRect(xOffset-8, yOffset1 - 2, tft.width() - 2*(xOffset-8), 14);
@@ -602,7 +605,7 @@ void Gamebuino::homeMenu(){
 	//last row
 	tft.setColor(DARKGRAY);
 	tft.fillRect(xOffset-8, yOffset3 - 2, tft.width() - 2*(xOffset-8), 14);
-		
+
 	while(1){
 		//Ensure constant framerate using millis (40ms = 25FPS)
 		if((millis() - lastMillis) > 40){
@@ -610,10 +613,10 @@ void Gamebuino::homeMenu(){
 			lastMillis = millis();
 			buttons.update();
 			frameCounter++;
-			
+
 			//clear noPixels
 			neoPixels.clear();
-			
+
 			if(buttons.released(Button::d) || buttons.released(Button::b) || buttons.released(Button::c)){
 				sound.stopEfxOnly();
 				HOME_MENU_RESTORE_STATE;
@@ -623,7 +626,7 @@ void Gamebuino::homeMenu(){
 			if(buttons.held(Button::d, 25)){
 				changeGame();
 			}
-			
+
 			if(buttons.repeat(Button::down, 8)){
 				currentItem++;
 				if(currentItem >= numItems){
@@ -631,7 +634,7 @@ void Gamebuino::homeMenu(){
 				}
 				changed = true;
 			}
-			
+
 			if(buttons.repeat(Button::up, 8)){
 				currentItem--;
 				if(currentItem < 0){
@@ -639,8 +642,8 @@ void Gamebuino::homeMenu(){
 				}
 				changed = true;
 			}
-			
-			
+
+
 			//blinking arrow
 			if((frameCounter%10) < 5){
 				tft.setColor(BROWN);
@@ -650,11 +653,11 @@ void Gamebuino::homeMenu(){
 			tft.cursorX = xOffset - 12;
 			tft.cursorY = yOffset2;
 			tft.print(">");
-			
+
 			tft.cursorX = xOffset;
 			tft.cursorY = yOffset2;
 			tft.setColor(WHITE, BROWN);
-			
+
 			tft.setColor(WHITE, BROWN);
 			switch(currentItem){
 				////EXIT
@@ -791,7 +794,7 @@ void Gamebuino::homeMenu(){
 					}
 				break;
 			}
-			
+
 			if(changed == true){
 				//bottom text first to feel snappy when you are seeking down
 				tft.cursorX = xOffset;
@@ -835,7 +838,7 @@ void Gamebuino::homeMenu(){
 							tft.print("*");
 						}
 					break;
-					
+
 				}
 				//upper text
 				tft.cursorX = xOffset;
@@ -843,10 +846,10 @@ void Gamebuino::homeMenu(){
 				tft.setColor(BROWN, DARKGRAY);
 				tft.print(language.get(menuText[wrap(currentItem-1, numItems)], NUMBER_SYSTEM_LANGUAGES));
 			}
-			
+
 			//updated nopixels
 			neoPixels.show();
-			
+
 			changed = false;
 		}
 	}
@@ -962,17 +965,17 @@ void Gamebuino::keyboard(char* text, uint8_t length) {
 			display.cursorY = currentY+1*(display.fontHeight+1);
 			display.print("\25");
 			display.print(language._get(lang_keyboard_type));
-			
+
 			display.cursorX = currentX-display.fontWidth*7-2;
 			display.cursorY = currentY+2*(display.fontHeight+1);
 			display.print("\26");
 			display.print(language._get(lang_keyboard_back));
-			
+
 			display.cursorX = currentX-display.fontWidth*7-2;
 			display.cursorY = currentY+3*(display.fontHeight+1);
 			display.print("\27");
 			display.print(language._get(lang_keyboard_save));
-			
+
 			//erase some pixels around the selected character
 			display.setColor(DISPLAY_DEFAULT_BACKGROUND_COLOR);
 			display.drawFastHLine(currentX + activeX * (display.fontWidth+1) - 1, currentY + activeY * (display.fontHeight+1) - 2, 7);
@@ -1042,8 +1045,8 @@ bool Gamebuino::collidePointRect(int16_t x1, int16_t y1 ,int16_t x2 ,int16_t y2,
 }
 
 bool Gamebuino::collideRectRect(int16_t x1, int16_t y1, int16_t w1, int16_t h1 ,int16_t x2 ,int16_t y2, int16_t w2, int16_t h2){
-  return !( x2     >=  x1+w1  || 
-            x2+w2  <=  x1     || 
+  return !( x2     >=  x1+w1  ||
+            x2+w2  <=  x1     ||
             y2     >=  y1+h1  ||
             y2+h2  <=  y1     );
 }
@@ -1057,7 +1060,7 @@ bool Gamebuino::collideBitmapBitmap(int16_t x1, int16_t y1, const uint8_t* b1, i
   if(collideRectRect(x1, y1, w1, h1, x2, y2, w2, h2) == false){
     return false;
   }
-  
+
   int16_t xmin = (x1>=x2)? 0 : x2-x1;
   int16_t ymin = (y1>=y2)? 0 : y2-y1;
   int16_t xmax = (x1+w1>=x2+w2)? x2+w2-x1 : w1;

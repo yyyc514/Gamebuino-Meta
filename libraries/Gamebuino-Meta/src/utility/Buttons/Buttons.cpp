@@ -23,40 +23,41 @@ Authors:
 
 #include "Buttons.h"
 
-#include <SPI.h>
+// #include <SPI.h>
 
 namespace Gamebuino_Meta {
 
 
 void Buttons::begin() {
-	SPI.begin();
-	pinMode(BTN_CS, OUTPUT);
-	digitalWrite(BTN_CS, HIGH);
+	// SPI.begin();
+	// pinMode(BTN_CS, OUTPUT);
+	// digitalWrite(BTN_CS, HIGH);
 }
 
 /*
  * reads each button states and store it
  */
 void Buttons::update() {
-	
+
 	//start SPI
-	SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
-	digitalWrite(BTN_CS, LOW);
+	// SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
+	// digitalWrite(BTN_CS, LOW);
 	//wait for PL to recover
-	delayMicroseconds(1);
+	// delayMicroseconds(1);
 	//get the buttons states from the shift register
-	byte buttonsData = SPI.transfer(1);
+	// byte buttonsData = SPI.transfer(1);
+	byte buttonsData = 0;
 	//end SPI
-	digitalWrite(BTN_CS, HIGH);
-	SPI.endTransaction();
+	// digitalWrite(BTN_CS, HIGH);
+	// SPI.endTransaction();
 	//Print raw data to native USB
 	//SerialUSB.println(buttonsData,BIN);
-  
+
 	for (uint8_t thisButton = 0; thisButton < NUM_BTN; thisButton++) {
 		//extract the corresponding bit corresponding to the current button
 		//Inverted logic : button pressed = low state = 0
 		bool pressed = (buttonsData & (1 << thisButton)) == 0;
-		
+
 		if (pressed) { //if button pressed
 			if (states[thisButton] < 0xFFFD) { // we want 0xFFFE to be max value for the counter
 				states[thisButton]++; //increase button hold time
@@ -119,7 +120,7 @@ bool Buttons::repeat(Button button, uint16_t period) {
 }
 
 /**
- * 
+ *
  * @param button The button's ID
  * @return The number of frames during which the button has been held.
  */

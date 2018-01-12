@@ -131,7 +131,7 @@ void Adafruit_NeoPixel::show(void) {
   // accessing the PORT.  The code takes an initial 'snapshot' of the PORT
   // state, computes 'pin high' and 'pin low' values, and writes these back
   // to the PORT register as needed.
-  
+
   noInterrupts(); // Need 100% focus on instruction timing
 
   // Tried this with a timer/counter, couldn't quite get adequate
@@ -140,26 +140,26 @@ void Adafruit_NeoPixel::show(void) {
   uint8_t  *ptr, *end, p, bitMask, portNum;
   uint32_t  pinMask;
 
-  portNum =  g_APinDescription[pin].ulPort;
-  pinMask =  1ul << g_APinDescription[pin].ulPin;
+  // portNum =  g_APinDescription[pin].ulPort;
+  // pinMask =  1ul << g_APinDescription[pin].ulPin;
   ptr     =  pixels;
   end     =  ptr + numBytes;
   p       = *ptr++;
   bitMask =  0x80;
 
-  volatile uint32_t *set = &(PORT->Group[portNum].OUTSET.reg),
-                    *clr = &(PORT->Group[portNum].OUTCLR.reg);
+  // volatile uint32_t *set = &(PORT->Group[portNum].OUTSET.reg),
+                    // *clr = &(PORT->Group[portNum].OUTCLR.reg);
 
   for(;;) {
-    *set = pinMask;
+    // *set = pinMask;
     asm("nop; nop; nop; nop; nop; nop; nop; nop;");
     if(p & bitMask) {
       asm("nop; nop; nop; nop; nop; nop; nop; nop;"
           "nop; nop; nop; nop; nop; nop; nop; nop;"
           "nop; nop; nop; nop;");
-      *clr = pinMask;
+      // *clr = pinMask;
     } else {
-      *clr = pinMask;
+      // *clr = pinMask;
       asm("nop; nop; nop; nop; nop; nop; nop; nop;"
           "nop; nop; nop; nop; nop; nop; nop; nop;"
           "nop; nop; nop; nop;");
