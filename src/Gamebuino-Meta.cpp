@@ -106,8 +106,8 @@ void Gamebuino::begin() {
 	static_assert(sizeof FOLDER_NAME - 1 >= 4, "your FOLDER_NAME must be at least 4 chars long!");
 #else
 	static_assert(sizeof __SKETCH_NAME__ - 1 >= 4 + 4, "Your sketch name is less than 4 chars long, please define FOLDER_NAME!");
-	memcpy(folder_name, __SKETCH_NAME__, sizeof __SKETCH_NAME__ - 4);
-	folder_name[sizeof __SKETCH_NAME__ - 4] = '\0';
+	memcpy(folder_name, __SKETCH_NAME__, sizeof __SKETCH_NAME__ - 5);
+	folder_name[sizeof __SKETCH_NAME__ - 5] = '\0';
 #endif
 
 	printf("folder name is %s\n", folder_name);
@@ -163,10 +163,15 @@ void Gamebuino::begin() {
 		display.println("OK!");
 		updateDisplay();
 	}
-	printf("after\n");
+	printf("afterboo\n");
 
 	display.setColor(Color::white, Color::black);
 	display.fill(Color::black);
+
+	printf("folder is %s\n", folder_name);
+
+	printf("test\n");
+	fflush(stdout);
 
 	// SD is initialized, let's switch to the folder!
 	if (!SD.exists(folder_name)) {

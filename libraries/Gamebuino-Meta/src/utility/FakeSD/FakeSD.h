@@ -7,29 +7,32 @@
 #include <unistd.h>
 #include "tinyfiles.h"
 
+#define MAX_FILE_LEN 2000
+
 class FakeSD {
 public:
   FakeSD(const char* path) {
-    printf("fake sd constructor\n");
     getcwd(cwd, sizeof(cwd));
     chdir(path, true);
-    printf("dir is: %s\n", cwd);
+    fflush(stdout);
   };
 
-  char cwd[1000];
-  char buf[2000];
+  char cwd[MAX_FILE_LEN];
+  char buf[MAX_FILE_LEN];
 
   void buildFullPath(char *buffer, char *dir, char *path) {
+    if (path[0] == '/') { path++; };
 
-    char slash = '/';
-    strncpy(buffer, dir, sizeof(dir));
+    char slash[2] = "/";
+    strncpy(buffer, dir, MAX_FILE_LEN);
     if (buffer[strlen(buffer)-1] == '/') {
       strcat(buffer,path);
     } else {
-      strcat(buffer,&slash);
+      strcat(buffer,slash);
       strcat(buffer,path);
     }
     printf("full path is: %s\n", buffer);
+    fflush(stdout);
   }
 
   bool exists(const char* path) {
@@ -68,11 +71,14 @@ public:
 
   bool chdir(const char *path, bool set_cwd = false) {
     buildFullPath(buf, cwd, (char *)path);
+    printf("looking for %s\n", buf);
     File f(buf);
     if (f.isDirectory()) {
+      printf("dir found\n");
         strncpy(cwd, buf, sizeof(cwd));
         return true;
     } else {
+      printf("not a dir\n");
       return false;
     }
   }
