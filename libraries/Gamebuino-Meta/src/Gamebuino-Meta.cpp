@@ -124,8 +124,8 @@ void Gamebuino::begin() {
 	SDL_Delay(500);
 
 
-	// if (!SD.begin(SD_CS)) {
-	if (true) {
+	if (!SD.begin(SD_CS)) {
+	// if (true) {
 		display.setColor(Color::red, Color::black);
 		display.println("FAILED!");
 		updateDisplay();
