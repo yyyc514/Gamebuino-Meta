@@ -11,6 +11,9 @@
 
 // let's first include our config. First one can be overriden inside the sketch, config.h contains the default configs
 #include "../sketch/config-gamebuino.h"
+#if __has_include("config-gamebuino.h")
+#include "config-gamebuino.h"
+#endif
 #include "config-default.h"
 
 #ifndef DISPLAY_CONSTRUCTOR
