@@ -2,7 +2,7 @@ CC=gcc
 CPP=g++
 LIBS=
 INCLUDES=-I. -Istub `sdl2-config --cflags --libs`
-SRC=$(wildcard utility/*.cpp) \
+SRC_ALL=$(wildcard utility/*.cpp) \
 	$(wildcard utility/*/*.cpp) \
 	$(wildcard utility/*/*/*.cpp) \
 	$(wildcard utility/*/*/*/*.cpp) \
@@ -10,6 +10,8 @@ SRC=$(wildcard utility/*.cpp) \
 	stub/time.cpp \
 	stub/WMath.cpp \
 	Gamebuino-Meta.cpp
+
+SRC=$(filter-out utility/Adafruit_ZeroDMA/%,$(SRC_ALL))
 
 CFLAGS=-std=c++11  $(INCLUDES) -w -g
 DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION
