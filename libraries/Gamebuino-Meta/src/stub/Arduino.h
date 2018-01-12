@@ -15,7 +15,7 @@
 #define PROGMEM
 
 
-#include "time.h"
+#include "timekeeping.h"
 
 #define SERCOM_SPI_MODE_0 0
 #define SERCOM_SPI_MODE_1 0
