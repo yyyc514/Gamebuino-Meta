@@ -192,6 +192,9 @@ class File {
 
     // close
     bool close() {
+      if (!_open) {
+        return false; }
+
       if (fclose(f)==0) {
         _open = false;
         return true;
@@ -202,10 +205,12 @@ class File {
 
     File openNextFile(uint8_t mode = O_READ) {
       tfFILE tmp;
+      File tmpFile;
       if (_dir.has_next) {
-        ::tfDirNext(&_dir);
         tfReadFile(&_dir, &tmp);
-        open(tmp.path, mode);
+        ::tfDirNext(&_dir);
+        tmpFile.open(tmp.path, mode);
+        return tmpFile;
       } else {
         return NULL;
       }

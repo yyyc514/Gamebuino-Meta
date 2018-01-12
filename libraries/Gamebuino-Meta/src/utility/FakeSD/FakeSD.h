@@ -58,10 +58,26 @@ public:
     }
   }
 
+  bool rmdir(const char* path) {
+    buildFullPath(buf, cwd, (char *)path);
+
+    if (withinJail(buf)) {
+      return ::rmdir(buf) == 0;
+    } else {
+      return false;
+    }
+  }
+
   // TODO: jail
   File open(const char *path, uint8_t mode = FILE_READ) {
     File tmpFile;
-    buildFullPath(buf, cwd, (char *)path);
+    if (path[0] == '/') {
+      // absolute, root it from the jail
+      buildFullPath(buf, _jail, (char *)path+1);
+    } else {
+      // relative, root it from CWD
+      buildFullPath(buf, cwd, (char *)path);
+    }
     tmpFile.open(buf, mode);
     return tmpFile;
   }
@@ -92,7 +108,7 @@ public:
 
     buildFullPath(buf, cwd, (char *)path);
     if (withinJail(buf)) {
-      uint8_t r = mkdir(buf);
+      uint8_t r = ::mkdir(buf, S_IRWXU);
       return r == 0; }
     else {
       return false;
@@ -133,7 +149,7 @@ public:
 private:
 
   bool withinJail(char * path) {
-    if (!_jail) { return true; }
+    if (!_jailed) { return true; }
     // make sure jail has / as last character
     if (_jail[strlen(_jail)-1] != '/') {
       printf("Your jail doesn't seem to have a / at the end.");
