@@ -14,7 +14,7 @@ public:
   FakeSD(const char* path) {
     getcwd(cwd, sizeof(cwd));
     chdir(path, true);
-    fflush(stdout);
+    chroot();
   };
 
   char cwd[MAX_FILE_LEN];
@@ -36,15 +36,26 @@ public:
   }
 
   bool exists(const char* path) {
-    buildFullPath(buf, cwd, (char *)path);
     struct stat   fstat;
-    return (stat (buf, &fstat) == 0);
+
+    buildFullPath(buf, cwd, (char *)path);
+    if (!_jailed || withinJail(buf)) {
+      return (stat (buf, &fstat) == 0);
+    } else {
+      return false;
+    }
   }
 
   bool remove(const char* path) {
     buildFullPath(buf, cwd, (char *)path);
-    // append paths
-    return ::remove(buf) == 0;
+
+    // TODO: use canonical here, but shouldn't matter as long as _jail
+    // is always canonical
+    if (!_jailed || withinJail(buf)) {
+      return ::remove(buf) == 0;
+    } else {
+      return false;
+    }
   }
 
   File open(const char *path, uint8_t mode = FILE_READ) {
@@ -69,20 +80,49 @@ public:
     return r == 0;
   }
 
+  void chroot() {
+    _jailed = true;
+    strcpy(_jail, cwd);
+  }
+
   bool chdir(const char *path, bool set_cwd = false) {
+    char canonical[MAX_FILE_LEN];
+
     buildFullPath(buf, cwd, (char *)path);
     printf("looking for %s\n", buf);
     File f(buf);
     if (f.isDirectory()) {
       printf("dir found\n");
-        strncpy(cwd, buf, sizeof(cwd));
+      realpath(buf, canonical);
+      strcat(canonical, "/");
+      printf("canonical: %s\n", canonical);
+      if (!_jailed || withinJail(canonical)) {
+        strncpy(cwd, canonical, sizeof(cwd));
         return true;
+      } else {
+        return false;
+      }
     } else {
       printf("not a dir\n");
       return false;
     }
   }
 
+private:
+
+  bool withinJail(char * path) {
+    // make sure jail has / as last character
+    if (_jail[strlen(_jail)-1] != '/') {
+      printf("Your jail doesn't seem to have a / at the end.");
+      return false;
+    }
+    // JAIL: /home/jim/fs/
+    // then  /home/jim/fs/* is consider safe
+    return memcmp(path, _jail, strlen(_jail)) == 0;
+  }
+
+  bool _jailed = false;
+  char _jail[MAX_FILE_LEN];
 
 
 };

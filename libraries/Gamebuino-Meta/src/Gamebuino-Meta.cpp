@@ -761,12 +761,14 @@ void Gamebuino::homeMenu(){
 							tft.setColor(LIGHTGREEN, BROWN);
 							tft.cursorX = xOffset;
 							tft.print(language._get(lang_homeMenu_SAVED));
+							tft.hardware.refresh();
 							delay(250);
 							changed = true;
 						} else {
 							tft.setColor(RED, BROWN);
 							tft.cursorX = xOffset;
 							tft.print(language._get(lang_homeMenu_ERROR));
+							tft.hardware.refresh();
 							delay(250);
 							changed = true;
 						}
