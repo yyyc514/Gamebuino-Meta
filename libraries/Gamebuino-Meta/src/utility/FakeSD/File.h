@@ -77,18 +77,31 @@ class File {
           strcat(mode, "r+"); // read/update
           break;
         case FILE_WRITE:
-          strcat(mode, "a+"); // append/update
+          strcat(mode, "r+"); // read/update
           break;
         case O_RDWR|O_CREAT|O_TRUNC:
           strcat(mode, "w+"); // write/update
           break;
         break;
       }
+      if (flags & O_APPEND) {
+        mode[0] = 'a'; // append mode
+      }
       if (flags & O_SYNC) {
         _always_flush = true;
       }
       // always binary mode
       strcat(mode, "b");
+    }
+
+    void _before_open() {
+      // if file does not exist and we are asked to create it
+      if ((_flags & O_CREAT) && stat(full_path, &_stat) == -1) {
+        f = fopen(full_path, "w");
+        close();
+        // need to do this again since we're past init now
+        stat(full_path, &_stat);
+      }
     }
 
     bool open(char* path, uint8_t oflag = O_READ) {
@@ -98,13 +111,14 @@ class File {
       modeFromFlags(mode, oflag);
 
       _init(path);
+      _before_open();
       f = fopen(path, mode);
       if (f == NULL) {
         return false;
       } else {
         _open = true;
         if (isDirectory()) {
-          ::tfDirOpen(&_dir, (char *)path);
+          ::tfDirOpen(&_dir, path);
         }
         if (isFile() && (_flags & O_AT_END)) {
           seekEnd(0);
@@ -139,13 +153,13 @@ class File {
       return write(str, strlen(str));
     }
     size_t write(uint8_t b) {
-      write(&b, 1);
+      return write(&b, 1);
     }
     size_t write(const void* buf, size_t nbyte) {
-      write((uint8_t*)buf, nbyte);
+      return write((uint8_t*)buf, nbyte);
     }
     size_t write(const uint8_t *buf, size_t size) {
-      fwrite(buf, 1, size, f);
+      return fwrite(buf, 1, size, f);
     };
 
 
@@ -204,9 +218,10 @@ class File {
       fflush(f);
     }
 
+    FILE *f;
   private:
 
-    FILE *f;
+
     bool _open = false;
 
     tfDIR _dir;

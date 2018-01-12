@@ -14,7 +14,7 @@ SRC_ALL=$(wildcard utility/*.cpp) \
 SRC=$(filter-out utility/Adafruit_ZeroDMA/% utility/SdFat/%,$(SRC_ALL))
 
 CFLAGS=-std=c++11  $(INCLUDES) -w -g
-DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION -D__SKETCH_NAME__='"solitaire.ino"'
+DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION -D__SKETCH_NAME__='"""solitaire.ino"""'
 OBJDIR=obj
 BUILD_DIR=build
 OFILES=$(foreach bname, $(notdir $(basename $(SRC))), $(BUILD_DIR)/$(bname).o) \
@@ -69,7 +69,7 @@ $(BUILD_DIR)/%.o : utility/**/**/**/%.cpp
 $(BUILD_DIR)/%.o : Gamebuino-Meta.cpp Gamebuino-Meta.h
 	g++ -c -o $@ $(CFLAGS) $(LIBS) $(DEFINES) $(filter %.cpp %.o, $^)
 
-meta.o: $(OFILES)
+$(BUILD_DIR)/meta.o: $(OFILES)
 # $(OBJDIR) meta.so: $(SRC) Gamebuino-Meta.h
 	# g++ -shared -c $(SRC) $(CFLAGS) $(LIBS) $(DEFINES)
 	# g++ -c -o $@ $(CFLAGS) $(LIBS) $(DEFINES) $(filter %.cpp %.o, $^)
@@ -78,7 +78,7 @@ meta.o: $(OFILES)
 
 SOLITAIRE_SRC=$(wildcard meta-solitaire/meta-solitaire/*.cpp)
 
-solitaire: $(SOLITAIRE_SRC) meta.o stub/core.cpp
+solitaire: $(SOLITAIRE_SRC) $(BUILD_DIR)/meta.o stub/core.cpp
 	g++ -o $@ $^ $(CFLAGS) $(LIBS) $(DEFINES)
 
 clean:
