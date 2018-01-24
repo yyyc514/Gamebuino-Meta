@@ -40,7 +40,13 @@ public:
   bool exists(const char* path) {
     struct stat   fstat;
 
-    buildFullPath(buf, cwd, (char *)path);
+    if (path[0] == '/') {
+      // absolute, root it from the jail
+      buildFullPath(buf, _jail, (char *)path+1);
+    } else {
+      // relative, root it from CWD
+      buildFullPath(buf, cwd, (char *)path);
+    }
     if (withinJail(buf)) {
       return (stat (buf, &fstat) == 0);
     } else {

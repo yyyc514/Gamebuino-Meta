@@ -105,6 +105,7 @@ class File {
     }
 
     bool open(char* path, uint8_t oflag = O_READ) {
+      printf("File::open('%s')\n", path);
       char mode[5];
 
       _flags = oflag;
@@ -206,14 +207,17 @@ class File {
     File openNextFile(uint8_t mode = O_READ) {
       tfFILE tmp;
       File tmpFile;
-      if (_dir.has_next) {
+      while (_dir.has_next) {
         tfReadFile(&_dir, &tmp);
         ::tfDirNext(&_dir);
+        // skip special directory entries
+        if (tmp.name[0] == '.') {
+          continue;
+        }
         tmpFile.open(tmp.path, mode);
         return tmpFile;
-      } else {
-        return NULL;
       }
+      return NULL;
     }
 
     bool truncate(uint32_t length){
