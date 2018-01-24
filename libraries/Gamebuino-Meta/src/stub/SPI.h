@@ -17,6 +17,9 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "fakeSPI.h"
+#define _SPI_H_INCLUDED
+
 #ifndef _SPI_H_INCLUDED
 #define _SPI_H_INCLUDED
 
