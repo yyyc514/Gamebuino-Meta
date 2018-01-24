@@ -163,6 +163,6 @@ class SPIClass {
   #define SPI_CLOCK_DIV128 255
 #endif
 
-SPIClass SPI;
+extern SPIClass SPI;
 
 #endif

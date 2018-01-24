@@ -24,15 +24,15 @@ Authors:
 #include "Buttons.h"
 #include <SDL.h>
 
-// #include <SPI.h>
+#include <SPI.h>
 
 namespace Gamebuino_Meta {
 
 
 void Buttons::begin() {
-	// SPI.begin();
-	// pinMode(BTN_CS, OUTPUT);
-	// digitalWrite(BTN_CS, HIGH);
+	SPI.begin();
+	pinMode(BTN_CS, OUTPUT);
+	digitalWrite(BTN_CS, HIGH);
 }
 
 /*

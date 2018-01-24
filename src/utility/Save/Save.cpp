@@ -71,10 +71,6 @@ SaveVar Save::getVarInfo(uint16_t i) {
 	f.seekSet(SAVEHEADER_SIZE + i);
 	uint8_t b = 0;
 	if (!f.read(&b, 1)) {
-		printf("position: %d", f.position());
-		printf("ferror: %d,", ferror(f.f));
-		printf("feof: %d,", feof(f.f));
-		fflush(stdout);
 		error("file I/O");
 	}
 	s.defined = (b & 0x80) ? true : false;

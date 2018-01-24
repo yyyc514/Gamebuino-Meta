@@ -24,10 +24,9 @@ Authors:
 #ifndef _GAMEBUINO_META_H_
 #define	_GAMEBUINO_META_H_
 
-// #ifndef __SKETCH_NAME__
-// #error "Please compile using the Gamebuino Meta board!"
-// #endif
-
+#ifndef __SKETCH_NAME__
+#error "Please compile using the Gamebuino Meta board!"
+#endif
 
 #include "config/config.h"
 

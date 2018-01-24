@@ -458,13 +458,13 @@ uint16_t Audio_Handler (void) {
 		if (output < 0) {
 			output = 0;
 		}
-		// analogWrite(A0, output);
+		analogWrite(A0, output);
 		return output;
 	} else {
 		// we need to output 0 when not in use to not have weird sound effects with the neoLeds as the interrupt isn't 100% constant there.
 		// however, jumping down from 512 (zero-positin) to 0 would give a plop
 		// so instead we gradually decrease instead
-		// analogWrite(A0, flowdown); // zero-position
+		analogWrite(A0, flowdown); // zero-position
 		return flowdown;
 		if (flowdown > 0) {
 			flowdown--;

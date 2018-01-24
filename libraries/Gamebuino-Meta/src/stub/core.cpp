@@ -19,7 +19,9 @@
 
 #include <Arduino.h>
 #include <SDL.h>
+#include <fakeSPI.h>
 
+SPIClass SPI;
 
 // Declared weak in Arduino.h to allow user redefinitions.
 int atexit(void (* /*func*/ )()) { return 0; }
