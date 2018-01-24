@@ -14,7 +14,8 @@ SRC_ALL=$(wildcard utility/*.cpp) \
 SRC=$(filter-out utility/Adafruit_ZeroDMA/% utility/SdFat/%,$(SRC_ALL))
 
 CFLAGS=-std=c++11  $(INCLUDES) -w -g
-DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION -D__SKETCH_NAME__='"""solitaire.ino"""'
+SKETCH_NAME?='"""solitaire.ino"""'
+DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION -D__SKETCH_NAME__=$(SKETCH_NAME)
 OBJDIR=obj
 BUILD_DIR=build
 OFILES=$(foreach bname, $(notdir $(basename $(SRC))), $(BUILD_DIR)/$(bname).o) \
