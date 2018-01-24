@@ -178,7 +178,6 @@ void Gamebuino::begin() {
 		titleScreen();
 #endif
 	}
-	// TODO: restore functionality
 	pickRandomSeed();
 	display.clear();
 }
@@ -375,10 +374,8 @@ bool Gamebuino::update() {
 }
 
 void Gamebuino::updateDisplay() {
-	// printf("updateDisplay()");
 	tft.drawImage(0, 0, display, tft.width(), tft.height()); //send the buffer to the screen
 	tft.hardware.refresh();
-	// printf("doneUpdateDisplay()\n");
 }
 
 void Gamebuino::setFrameRate(uint8_t fps) {
@@ -615,35 +612,9 @@ void Gamebuino::homeMenu(){
 	tft.textWrap = false;
 	//horizontal stripes
 
-	// tft.setColor(DARKGRAY);
-	// for (int i = 12; i < tft.height(); i+=4){
-		// tft.fillRect(0, i, tft.width(), 2);
-	// }
-	tft.setAddrWindow(0,0,159,127);
-	uint16_t *b = display._buffer;
-	uint16_t data;
-	for (uint16_t y=0; y<64; y++) {
-		for (uint16_t x=0; x<80; x++) {
-			data = *b;
-			//        gggbbbbbrrrrrggg
-			// data &= 0b1101111011110111;
-			// data &= 0b0001111011110000;
-			//        rrrrrggggggbbbbb
-			data &= 0b1110011110011100;
-			data >>= 2;
-			tft.pushColor(data);
-			tft.pushColor(data);
-			b++;
-		}
-		b-=80;
-		for (uint16_t x=0; x<80; x++) {
-			data = *b;
-			data &= 0b1110011110011100;
-			data >>= 1;
-			tft.pushColor(data);
-			tft.pushColor(data);
-			b++;
-		}
+	tft.setColor(DARKGRAY);
+	for (int i = 12; i < tft.height(); i+=4){
+		tft.fillRect(0, i, tft.width(), 2);
 	}
 
 	tft.setColor(DARKGRAY);

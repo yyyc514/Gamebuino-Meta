@@ -25,7 +25,7 @@ Authors:
 #define CONERT_MASK 0xFF000000
 #define CONVERT_MAGIC 0xA1000000
 
-// #include <Gamebuino-Meta.h>
+#include <Gamebuino-Meta.h>
 
 namespace Gamebuino_Meta {
 
