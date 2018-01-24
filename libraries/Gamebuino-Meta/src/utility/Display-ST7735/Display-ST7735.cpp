@@ -26,10 +26,9 @@ as well as Adafruit raw 1.8" TFT display
 #include "../Emu-ST7735/Emu-7735.h"
 #include "Display-ST7735.h"
 #include <limits.h>
-// #include "pins_arduino.h"
-// #include "wiring_private.h"
-// #include <SPI.h>
-#include "fakeSPI.h"
+#include "pins_arduino.h"
+#include "wiring_private.h"
+#include <SPI.h>
 #include "../Image.h"
 
 uint32_t fakePort;
