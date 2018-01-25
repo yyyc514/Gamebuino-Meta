@@ -14,6 +14,7 @@ To design/play test games without having an actual META device.
 - LCD hardware emulation 160x128, 12/16/18 bit modes
 - Buttons via the keyboard (cursor keys, A, Z (B), M (Menu), Return (Home))
 - The SDFat emulation layer (FakeSD) may not be fully implimented. (I implimented enough to get most of my test sketches working.)
+- Sound works. (It just passes SOUND_FREQ directly to SDL, though I've only tested 44.1KHz.)
 - The filesystem found locally in `fs` will be the contents of the SD card.
 - Some effort is made to "root" the sketch into the `fs` folder but since you're running this code locally on your own system please use caution and know what you are compiling (always a good idea).
 
