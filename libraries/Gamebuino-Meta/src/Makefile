@@ -14,7 +14,7 @@ SRC_ALL=$(wildcard utility/*.cpp) \
 SRC=$(filter-out utility/Adafruit_ZeroDMA/% utility/SdFat/%,$(SRC_ALL))
 
 CFLAGS=-std=c++11  $(INCLUDES) -w -g
-SKETCH_NAME?='"""solitaire.ino"""'
+SKETCH_NAME?='"""library.ino"""'
 DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION -D__SKETCH_NAME__=$(SKETCH_NAME)
 OBJDIR=obj
 BUILD_DIR=build
@@ -30,7 +30,7 @@ OFILES=$(foreach bname, $(notdir $(basename $(SRC))), $(BUILD_DIR)/$(bname).o) \
 
 # $(warning $(OFILES))
 
-all: $(BUILD_DIR) solitaire
+all: $(BUILD_DIR) $(BUILD_DIR)/meta.o
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
@@ -76,11 +76,6 @@ $(BUILD_DIR)/meta.o: $(OFILES)
 	# g++ -c -o $@ $(CFLAGS) $(LIBS) $(DEFINES) $(filter %.cpp %.o, $^)
 	ar ru $@ $^
 	ranlib $@
-
-SOLITAIRE_SRC=$(wildcard meta-solitaire/meta-solitaire/*.cpp)
-
-solitaire: $(SOLITAIRE_SRC) $(BUILD_DIR)/meta.o stub/core.cpp
-	g++ -o $@ $^ $(CFLAGS) $(LIBS) $(DEFINES)
 
 clean:
 	rm -rf build/*.o
