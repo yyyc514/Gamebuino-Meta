@@ -152,7 +152,7 @@ void Sound::begin() {
 	want.freq = SOUND_FREQ;
 	want.format = AUDIO_U8;
 	want.channels = 1;
-	want.samples = 2048;
+	want.samples = SOUND_BUFFERSIZE;
 	want.callback = fillBuffer;
 
 	dev = SDL_OpenAudioDevice(NULL, 0, &want, &have, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
