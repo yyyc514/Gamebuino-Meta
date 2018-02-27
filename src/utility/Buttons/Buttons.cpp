@@ -58,10 +58,10 @@ void Buttons::update() {
 				_pressed |= (1 << (uint8_t)Button::b);
 				break;
 				case SDLK_m:
-				_pressed |= (1 << (uint8_t)Button::c);
+				_pressed |= (1 << (uint8_t)Button::menu);
 				break;
 				case SDLK_RETURN:
-				_pressed |= (1 << (uint8_t)Button::d);
+				_pressed |= (1 << (uint8_t)Button::home);
 				break;
 				case SDLK_UP:
 				_pressed |= (1 << (uint8_t)Button::up);
@@ -86,10 +86,10 @@ void Buttons::update() {
 				_pressed &= ~(1 << (uint8_t)Button::b);
 				break;
 				case SDLK_m:
-				_pressed &= ~(1 << (uint8_t)Button::c);
+				_pressed &= ~(1 << (uint8_t)Button::menu);
 				break;
 				case SDLK_RETURN:
-				_pressed &= ~(1 << (uint8_t)Button::d);
+				_pressed &= ~(1 << (uint8_t)Button::home);
 				break;
 				case SDLK_UP:
 				_pressed &= ~(1 << (uint8_t)Button::up);
