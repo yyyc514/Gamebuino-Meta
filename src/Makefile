@@ -80,4 +80,4 @@ $(BUILD_DIR)/meta.o: $(OFILES)
 clean:
 	rm -rf build/*.o
 	rm -rf build/*.so
-	rm solitaire
+	rmdir build
