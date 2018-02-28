@@ -146,14 +146,11 @@ void Gamebuino::begin() {
 	display.setCursor(0,display.height() - (display.getFontHeight()*display.fontSize));
 	display.print("SD INIT... ");
 
-	printf("half way\n");
-
 	updateDisplay();
 	SDL_Delay(500);
 
 
 	if (!SD.begin(SD_CS)) {
-	// if (true) {
 		display.setColor(Color::red, Color::black);
 		display.println("FAILED!");
 		updateDisplay();
@@ -163,14 +160,11 @@ void Gamebuino::begin() {
 		display.println("OK!");
 		updateDisplay();
 	}
-	printf("afterboo\n");
 
 	display.setColor(Color::white, Color::black);
 	display.fill(Color::black);
 
-	printf("folder is %s\n", folder_name);
-
-	printf("test\n");
+	printf("app folder is %s\n", folder_name);
 	fflush(stdout);
 
 	// SD is initialized, let's switch to the folder!

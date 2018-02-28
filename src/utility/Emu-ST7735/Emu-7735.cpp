@@ -6,8 +6,6 @@ EmuST7735::EmuST7735() {
 };
 
 void EmuST7735::begin() {
-  printf("setting up EMUST7735\n");
-
   window = SDL_CreateWindow( "Gamebuino META", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
     160*4, 128*4, SDL_WINDOW_SHOWN);
   if( window == NULL )
