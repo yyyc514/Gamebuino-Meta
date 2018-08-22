@@ -13,7 +13,9 @@ SRC_ALL=$(wildcard utility/*.cpp) \
 
 SRC=$(filter-out utility/Adafruit_ZeroDMA/% utility/SdFat/%,$(SRC_ALL))
 
-CFLAGS=-std=c++11  $(INCLUDES) -w -g
+# EXTRA_INCLUDES is passed from the sketch to allow inclusion of the
+# local config-gamebuino.h if there is one
+CFLAGS=-std=c++11  $(INCLUDES) $(EXTRA_INCLUDES) -w -g
 SKETCH_NAME?='"""library.ino"""'
 DEFINES=-DARDUINO=185 -D__arm__ -DSPI_HAS_TRANSACTION -D__SKETCH_NAME__=$(SKETCH_NAME)
 OBJDIR=obj
