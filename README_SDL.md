@@ -26,9 +26,10 @@ First you'll need to build the library itself.
 
 ```
 git clone https://github.com/yyyc514/Gamebuino-Meta.git
+cd Gamebuino-Meta
 # checkout the SDL branch
-git co sdl
-cd Gamebuino-Meta/libraries/Gamebuino-Meta/src
+git checkout sdl
+cd src
 make
 ```
 
